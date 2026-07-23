@@ -9,6 +9,8 @@ from aiogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     KeyboardButton,
+    MenuButtonDefault,
+    MenuButtonWebApp,
     Message,
     ReplyKeyboardMarkup,
     WebAppInfo,
@@ -43,17 +45,50 @@ def is_own_contact(contact_user_id: int | None, from_user_id: int) -> bool:
     return contact_user_id is not None and contact_user_id == from_user_id
 
 
+def open_app_keyboard() -> InlineKeyboardMarkup | None:
+    """Inline button that opens the Mini App (None if no URL is configured yet)."""
+    if not settings.miniapp_url:
+        return None
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=UZ["open_app"], web_app=WebAppInfo(url=settings.miniapp_url)
+                )
+            ]
+        ]
+    )
+
+
+async def _user_has_phone(telegram_id: int) -> bool:
+    async with SessionLocal() as session:
+        user = await user_crud.get_by_telegram_id(session, telegram_id)
+        return bool(user and user.phone)
+
+
+async def _greet(message: Message) -> None:
+    """Plain /start: ask for the phone only if we don't have it yet; otherwise
+    just welcome back (the Open-app menu button is always available)."""
+    if message.from_user and await _user_has_phone(message.from_user.id):
+        await message.answer(UZ["welcome_back"], reply_markup=open_app_keyboard())
+    else:
+        await message.answer(UZ["welcome"], reply_markup=phone_keyboard())
+
+
 @dp.message(CommandStart(deep_link=True))
 async def on_start_deeplink(message: Message, command: CommandObject) -> None:
     payload = command.args or ""
+    # Native-app login needs the phone to bind the nonce, so always request it.
     if message.from_user and payload.startswith("login_"):
         _pending_logins[message.from_user.id] = payload[len("login_") :]
-    await message.answer(UZ["welcome"], reply_markup=phone_keyboard())
+        await message.answer(UZ["welcome"], reply_markup=phone_keyboard())
+        return
+    await _greet(message)
 
 
 @dp.message(CommandStart())
 async def on_start(message: Message) -> None:
-    await message.answer(UZ["welcome"], reply_markup=phone_keyboard())
+    await _greet(message)
 
 
 @dp.message(F.contact)
@@ -85,20 +120,11 @@ async def on_contact(message: Message) -> None:
         await message.answer(UZ["return_to_app"])
         return
 
-    if settings.miniapp_url:
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=UZ["open_app"],
-                        web_app=WebAppInfo(url=settings.miniapp_url),
-                    )
-                ]
-            ]
-        )
-        await message.answer(UZ["phone_saved_open"], reply_markup=keyboard)
-    else:
-        await message.answer(UZ["phone_saved_no_url"])
+    keyboard = open_app_keyboard()
+    await message.answer(
+        UZ["phone_saved_open"] if keyboard else UZ["phone_saved_no_url"],
+        reply_markup=keyboard,
+    )
 
 
 async def _wait_for_db(retries: int = 30) -> None:
@@ -118,5 +144,14 @@ async def run() -> None:
         raise SystemExit("TELEGRAM_BOT_TOKEN not set")
     await _wait_for_db()
     bot = Bot(settings.telegram_bot_token)
+    # Persistent "Open app" button by the message input, always available.
+    if settings.miniapp_url:
+        await bot.set_chat_menu_button(
+            menu_button=MenuButtonWebApp(
+                text=UZ["menu_button"], web_app=WebAppInfo(url=settings.miniapp_url)
+            )
+        )
+    else:
+        await bot.set_chat_menu_button(menu_button=MenuButtonDefault())
     logger.info("Shahrim bot started (polling)")
     await dp.start_polling(bot)

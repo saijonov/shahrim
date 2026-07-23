@@ -16,4 +16,6 @@ UZ: dict[str, str] = {
     ),
     "open_app": "Shahrim'ni ochish",
     "return_to_app": "Rahmat! Endi Shahrim ilovasiga qayting — tizimga kirdingiz.",
+    "welcome_back": "Xush kelibsiz! Ilovani quyidagi tugma orqali istalgan vaqtda oching.",
+    "menu_button": "Shahrim",
 }

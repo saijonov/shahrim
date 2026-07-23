@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Linking, ScrollView, Text, View } from "react-native";
+import { Image, Linking, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as Crypto from "expo-crypto";
@@ -121,18 +121,12 @@ export function LoginScreen() {
       }}
     >
       <View style={{ gap: theme.space[4] }}>
-        <View
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: theme.radius.lg,
-            backgroundColor: theme.color.primarySoft,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text style={{ fontSize: 32 }}>🏙️</Text>
-        </View>
+        <Image
+          source={require("../assets/logo-mark.png")}
+          style={{ width: 76, height: 76 }}
+          resizeMode="contain"
+          accessibilityLabel={t("app_name")}
+        />
         <View style={{ gap: theme.space[2] }}>
           <Title
             style={{
