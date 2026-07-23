@@ -33,6 +33,13 @@ const localMessages = {
   timeline: "Holatlar tarixi",
   no_photo: "Surat yo'q",
   load_error: "Murojaatlarni yuklashda xatolik yuz berdi. Qayta urinib ko'ring.",
+  // Rating (Phase 6). rate_resolution, leave_comment, thank_you, submit and
+  // retry are reused from the shared @shahrim/i18n set; these are extras.
+  your_rating: "Sizning bahoyingiz",
+  // Per-star aria label. `n` (not i18next's plural-triggering `count`) keeps it
+  // a plain substitution: "1 yulduz" … "5 yulduz".
+  star_aria: "{{n}} yulduz",
+  rating_error: "Baho yuborishda xatolik. Qayta urinib ko'ring.",
 } as const;
 
 const translation = { ...messages, ...localMessages };

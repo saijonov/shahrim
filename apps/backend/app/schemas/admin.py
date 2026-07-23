@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas.issue import ResolutionOut, StatusHistoryOut
+from app.schemas.issue import RatingOut, ResolutionOut, StatusHistoryOut
 
 
 class AdminLoginRequest(BaseModel):
@@ -49,6 +49,7 @@ class AdminIssueOut(BaseModel):
 class AdminIssueDetailOut(AdminIssueOut):
     status_history: list[StatusHistoryOut] = []
     resolution: ResolutionOut | None = None
+    rating: RatingOut | None = None
 
 
 class IssueListResponse(BaseModel):

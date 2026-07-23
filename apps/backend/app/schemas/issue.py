@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AnalyzeRequest(BaseModel):
@@ -55,6 +55,20 @@ class ResolutionOut(BaseModel):
     resolved_at: datetime
 
 
+class RatingCreate(BaseModel):
+    stars: int = Field(ge=1, le=5)
+    comment: str | None = None
+
+
+class RatingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    stars: int
+    comment: str | None
+    created_at: datetime
+
+
 class IssueDetailOut(IssueOut):
     status_history: list[StatusHistoryOut] = []
     resolution: ResolutionOut | None = None
+    rating: RatingOut | None = None

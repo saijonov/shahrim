@@ -14,7 +14,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 | 3 | AI pipeline (OpenAI GPT-4o vision) | ✅ |
 | 4 | My reports + statuses + notifications | ✅ |
 | 5 | Admin portal (map, filters, analytics, resolve) | ✅ |
-| 6 | Rating | ⬜ |
+| 6 | Rating | ✅ |
 | 7 | Native app (Expo) | ⬜ |
 | 8 | Polish & hardening | ⬜ |
 
@@ -126,3 +126,18 @@ The live "get a Telegram message on status change" is exercised end-to-end in Ph
 ### Notes
 - Admin dev server runs on **http://localhost:5174**; log in with the `ADMIN_EMAIL`/`ADMIN_PASSWORD` from `.env`.
 - The admin JS bundle is ~780 KB (Leaflet + Recharts) — code-splitting deferred to Phase 8 polish.
+
+---
+
+## Phase 6 — Rating
+
+**Goal:** the citizen rates a resolved issue (1–5 stars + comment); the admin sees the average rating.
+
+### Log
+- **Backend:** `POST /issues/{id}/rating` {stars 1–5, comment?} — owner-only, issue must be `resolved`, one rating per issue (unique). Rating is included in the citizen `GET /issues/{id}` detail and the admin detail; `avg_rating` already surfaces in `GET /admin/analytics` (Phase 5). Files: `app/crud/rating.py`, route in `app/api/routes/issues.py`.
+- **Mini App:** in the issue-detail screen, resolved issues show a rating section — an accessible 1–5 star selector + optional comment + submit (`rateIssue`), flipping to a read-only "Sizning bahoyingiz" view after submit (or if already rated). The resolved Telegram notification already asks the citizen to rate.
+- `@shahrim/api-client` gained `rateIssue()` + `RatingInfo`, and `IssueDetail.rating`.
+
+### What was tested (all green)
+- Backend `pytest`: **47 passed** (adds: rate resolved issue; reject before-resolved → 400, duplicate → 409, non-owner → 404, invalid stars → 422; rating in detail; avg_rating in analytics). `ruff` + format clean.
+- Mini App: `tsc --noEmit` clean; `vitest` **17 passed** (adds: star selector + submit calls rateIssue → thank-you; already-rated read-only; no section when not resolved). Workspace typecheck (5 projects) green.

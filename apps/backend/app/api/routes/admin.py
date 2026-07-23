@@ -9,6 +9,7 @@ from app.api.deps import get_current_admin
 from app.core.security import create_access_token, verify_password
 from app.crud import admin as admin_crud
 from app.crud import issue as issue_crud
+from app.crud import rating as rating_crud
 from app.db.session import get_session
 from app.models import Issue, Resolution, User
 from app.schemas.admin import (
@@ -23,7 +24,7 @@ from app.schemas.admin import (
     ResolveRequest,
     StatusChangeRequest,
 )
-from app.schemas.issue import ResolutionOut, StatusHistoryOut
+from app.schemas.issue import RatingOut, ResolutionOut, StatusHistoryOut
 from app.services.issue_status import change_issue_status
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -141,6 +142,7 @@ async def _detail(session: AsyncSession, issue: Issue) -> AdminIssueDetailOut:
     reporter = await session.get(User, issue.user_id)
     history = await issue_crud.get_status_history(session, issue.id)
     resolution = await issue_crud.get_resolution(session, issue.id)
+    rating = await rating_crud.get_rating(session, issue.id)
     base = _issue_out(
         issue,
         reporter.first_name if reporter else None,
@@ -150,6 +152,7 @@ async def _detail(session: AsyncSession, issue: Issue) -> AdminIssueDetailOut:
         **base.model_dump(),
         status_history=[StatusHistoryOut.model_validate(h) for h in history],
         resolution=ResolutionOut.model_validate(resolution) if resolution else None,
+        rating=RatingOut.model_validate(rating) if rating else None,
     )
 
 

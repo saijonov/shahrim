@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createClient } from "@shahrim/api-client";
-import type { IssueDetail as IssueDetailData } from "@shahrim/api-client";
+import type {
+  IssueDetail as IssueDetailData,
+  ApiClient,
+  RatingInfo,
+} from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
 import { StatusBadge } from "./MyReports";
 import { STATUS_KEY, formatDateTime } from "./lib/status";
@@ -109,12 +113,12 @@ export function IssueDetail({ id, onExit }: IssueDetailProps) {
         </section>
       )}
 
-      {phase === "ready" && issue && <Body issue={issue} />}
+      {phase === "ready" && issue && <Body issue={issue} client={client} />}
     </div>
   );
 }
 
-function Body({ issue }: { issue: IssueDetailData }) {
+function Body({ issue, client }: { issue: IssueDetailData; client: ApiClient }) {
   const { t } = useTranslation();
   const categoryName = t(`cat_${issue.category_code}`);
   const description =
@@ -217,6 +221,11 @@ function Body({ issue }: { issue: IssueDetailData }) {
         </section>
       )}
 
+      {/* Rating (PRD §6.4) — only for resolved issues. */}
+      {issue.status === "resolved" && (
+        <RatingSection issue={issue} client={client} />
+      )}
+
       {/* Status timeline (newest first). */}
       {timeline.length > 0 && (
         <section className="sh-timeline" style={{ gap: tokens.space[3] }}>
@@ -247,6 +256,154 @@ function Body({ issue }: { issue: IssueDetailData }) {
         </section>
       )}
     </>
+  );
+}
+
+/**
+ * Rating widget (PRD §6.4). Rendered only when the issue is resolved. If the
+ * report is not yet rated it shows an interactive 1–5 star selector, an optional
+ * comment and a submit button; after a successful submit (or if the issue was
+ * already rated) it renders the given rating read-only. All copy is Uzbek.
+ */
+function RatingSection({
+  issue,
+  client,
+}: {
+  issue: IssueDetailData;
+  client: ApiClient;
+}) {
+  const { t } = useTranslation();
+  const [rating, setRating] = useState<RatingInfo | null>(issue.rating);
+  const [justSubmitted, setJustSubmitted] = useState(false);
+  const [stars, setStars] = useState(0);
+  const [comment, setComment] = useState("");
+  const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  const submit = () => {
+    if (stars < 1 || sending) return;
+    setSending(true);
+    setFailed(false);
+    client
+      .rateIssue(issue.id, { stars, comment: comment.trim() || null })
+      .then((info) => {
+        setRating(info);
+        setJustSubmitted(true);
+      })
+      .catch(() => setFailed(true))
+      .finally(() => setSending(false));
+  };
+
+  return (
+    <section
+      className="sh-card sh-rating"
+      style={{
+        padding: tokens.space[5],
+        borderRadius: tokens.radius.lg,
+        gap: tokens.space[3],
+      }}
+    >
+      {rating ? (
+        <>
+          <h3
+            className="sh-step__title"
+            style={{ fontSize: tokens.fontSize.lg }}
+          >
+            {justSubmitted ? t("thank_you") : t("your_rating")}
+          </h3>
+          <StarDisplay stars={rating.stars} />
+          {rating.comment ? (
+            <p style={{ fontSize: tokens.fontSize.base }}>{rating.comment}</p>
+          ) : null}
+        </>
+      ) : (
+        <>
+          <h3
+            className="sh-step__title"
+            style={{ fontSize: tokens.fontSize.lg }}
+          >
+            {t("rate_resolution")}
+          </h3>
+
+          <div
+            className="sh-stars"
+            role="group"
+            aria-label={t("rate_resolution")}
+            style={{ gap: tokens.space[1] }}
+          >
+            {[1, 2, 3, 4, 5].map((n) => {
+              const filled = stars >= n;
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  className={`sh-star${filled ? " is-filled" : ""}`}
+                  aria-label={t("star_aria", { n })}
+                  aria-pressed={filled}
+                  onClick={() => setStars(n)}
+                  disabled={sending}
+                >
+                  <span aria-hidden="true">{filled ? "★" : "☆"}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <textarea
+            className="sh-textarea"
+            style={{ borderRadius: tokens.radius.md, fontSize: tokens.fontSize.base }}
+            placeholder={t("leave_comment")}
+            aria-label={t("leave_comment")}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            disabled={sending}
+          />
+
+          {failed && (
+            <p className="sh-error" role="alert" style={{ fontSize: tokens.fontSize.sm }}>
+              {t("rating_error")}
+            </p>
+          )}
+
+          <button
+            type="button"
+            className="sh-btn sh-btn--primary"
+            style={{
+              padding: `${tokens.space[4]}px ${tokens.space[6]}px`,
+              borderRadius: tokens.radius.lg,
+              fontSize: tokens.fontSize.lg,
+            }}
+            onClick={submit}
+            disabled={stars < 1 || sending}
+          >
+            {sending ? t("sending") : t("submit")}
+          </button>
+        </>
+      )}
+    </section>
+  );
+}
+
+/** Read-only 1–5 star row. The count is exposed to assistive tech via a label. */
+function StarDisplay({ stars }: { stars: number }) {
+  const { t } = useTranslation();
+  return (
+    <div
+      className="sh-stars sh-stars--readonly"
+      role="img"
+      aria-label={t("star_aria", { n: stars })}
+      style={{ gap: tokens.space[1] }}
+    >
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span
+          key={n}
+          className={`sh-star${stars >= n ? " is-filled" : ""}`}
+          aria-hidden="true"
+        >
+          {stars >= n ? "★" : "☆"}
+        </span>
+      ))}
+    </div>
   );
 }
 

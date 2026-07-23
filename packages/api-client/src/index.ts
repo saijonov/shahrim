@@ -65,9 +65,16 @@ export interface Resolution {
   resolved_at: string;
 }
 
+export interface RatingInfo {
+  stars: number;
+  comment: string | null;
+  created_at: string;
+}
+
 export interface IssueDetail extends Issue {
   status_history: StatusHistoryEntry[];
   resolution: Resolution | null;
+  rating: RatingInfo | null;
 }
 
 // ---- Client ----
@@ -133,6 +140,8 @@ export interface ApiClient {
   listMyIssues: () => Promise<Issue[]>;
   /** One issue with its status timeline and resolution (owner-scoped). */
   getIssue: (id: number) => Promise<IssueDetail>;
+  /** Rate a resolved issue (1-5 stars + optional comment). One per issue. */
+  rateIssue: (id: number, payload: { stars: number; comment?: string | null }) => Promise<RatingInfo>;
 }
 
 export function createClient(options: ClientOptions): ApiClient {
@@ -185,5 +194,10 @@ export function createClient(options: ClientOptions): ApiClient {
       }),
     listMyIssues: () => request<Issue[]>("/issues/mine"),
     getIssue: (id: number) => request<IssueDetail>(`/issues/${id}`),
+    rateIssue: (id: number, payload: { stars: number; comment?: string | null }) =>
+      request<RatingInfo>(`/issues/${id}/rating`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
   };
 }

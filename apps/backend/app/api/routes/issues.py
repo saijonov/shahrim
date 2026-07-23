@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.crud import category as category_crud
 from app.crud import issue as issue_crud
+from app.crud import rating as rating_crud
 from app.db.session import get_session
 from app.models import Category, User
 from app.schemas.issue import (
@@ -13,6 +14,8 @@ from app.schemas.issue import (
     IssueCreate,
     IssueDetailOut,
     IssueOut,
+    RatingCreate,
+    RatingOut,
     ResolutionOut,
     StatusHistoryOut,
 )
@@ -103,9 +106,36 @@ async def get_issue_detail(
 
     history = await issue_crud.get_status_history(session, issue_id)
     resolution = await issue_crud.get_resolution(session, issue_id)
+    rating = await rating_crud.get_rating(session, issue_id)
 
     return IssueDetailOut(
         **IssueOut.model_validate(issue).model_dump(),
         status_history=[StatusHistoryOut.model_validate(h) for h in history],
         resolution=ResolutionOut.model_validate(resolution) if resolution else None,
+        rating=RatingOut.model_validate(rating) if rating else None,
     )
+
+
+@router.post("/issues/{issue_id}/rating", response_model=RatingOut)
+async def rate_issue(
+    issue_id: int,
+    body: RatingCreate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> RatingOut:
+    issue = await issue_crud.get_issue(session, issue_id)
+    if issue is None or issue.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Murojaat topilmadi")
+    if issue.status != "resolved":
+        raise HTTPException(status_code=400, detail="Faqat hal qilingan murojaatni baholash mumkin")
+    if await rating_crud.get_rating(session, issue_id) is not None:
+        raise HTTPException(status_code=409, detail="Bu murojaat allaqachon baholangan")
+
+    rating = await rating_crud.create_rating(
+        session,
+        issue_id=issue_id,
+        user_id=current_user.id,
+        stars=body.stars,
+        comment=body.comment,
+    )
+    return RatingOut.model_validate(rating)
