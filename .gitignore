@@ -19,6 +19,9 @@ CLAUDE.md
 **/plans/
 *.plan.md
 
+# ---- Design references (large exported bundles; not source) ----
+*standalone*.html
+
 # ---- Node / JS ----
 node_modules/
 .pnpm-store/

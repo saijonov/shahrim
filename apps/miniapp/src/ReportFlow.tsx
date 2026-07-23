@@ -12,6 +12,8 @@ import { createClient, ApiError } from "@shahrim/api-client";
 import type { Category, Urgency } from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
 import { compressImage } from "./lib/image";
+import { Icon } from "./components/Icon";
+import { categoryIcon } from "./lib/categoryIcons";
 
 // Leaflet is heavy and touches the DOM at import time, so the map is code-split
 // and only loaded once the citizen reaches the location step. This also keeps
@@ -306,7 +308,8 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
           onClick={goBack}
           aria-label={t("back")}
         >
-          ← {t("back")}
+          <Icon id="ic-back" size={18} />
+          {t("back")}
         </button>
         <ol className="sh-steps" aria-hidden="true">
           {STEPS.map((s, i) => (
@@ -361,7 +364,7 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <span className="sh-dropzone__icon" aria-hidden="true">
-                  📷
+                  <Icon id="ic-camera" size={42} />
                 </span>
                 <span style={{ fontSize: tokens.fontSize.lg }}>
                   {t("add_photo")}
@@ -396,9 +399,12 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
 
             {suggestions.length > 0 && (
               <div className="sh-suggests" style={{ gap: tokens.space[2] }}>
-                <p className="sh-meta" style={{ fontSize: tokens.fontSize.sm }}>
-                  {t("ai_suggestions")}
-                </p>
+                <div className="sh-suggests__head">
+                  <Icon id="ic-star" size={18} />
+                  <p className="sh-meta" style={{ fontSize: tokens.fontSize.sm }}>
+                    {t("ai_suggestions")}
+                  </p>
+                </div>
                 <div className="sh-suggests__list" style={{ gap: tokens.space[2] }}>
                   {suggestions.map((suggestion, i) => (
                     <button
@@ -449,8 +455,13 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
                     className={"sh-chip" + (selected ? " is-selected" : "")}
                     aria-pressed={selected}
                     onClick={() => setCategoryCode(cat.code)}
-                    style={{ borderRadius: tokens.radius.md, fontSize: tokens.fontSize.base }}
+                    style={{ borderRadius: tokens.radius.lg }}
                   >
+                    <Icon
+                      id={categoryIcon(cat.code)}
+                      size={28}
+                      className="sh-chip__icon"
+                    />
                     {cat.name_uz}
                   </button>
                 );
@@ -511,6 +522,7 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
               disabled={submitting || lat == null || lng == null}
               onClick={() => void submit()}
             >
+              {!submitting && <Icon id="ic-send" size={21} />}
               {submitting ? t("sending") : t("submit")}
             </button>
           </>

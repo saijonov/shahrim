@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { createClient } from "@shahrim/api-client";
 import type { Issue } from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
-import { STATUS_COLOR, STATUS_KEY, formatDate } from "./lib/status";
+import { STATUS_KEY, formatDate } from "./lib/status";
+import { Icon } from "./components/Icon";
+import { categoryIcon } from "./lib/categoryIcons";
 
 const TOKEN_KEY = "shahrim_token";
 
@@ -65,7 +67,8 @@ export function MyReports({ onExit, onOpen }: MyReportsProps) {
           onClick={onExit}
           aria-label={t("back")}
         >
-          ← {t("back")}
+          <Icon id="ic-back" size={18} />
+          {t("back")}
         </button>
       </div>
 
@@ -168,9 +171,7 @@ function IssueCard({
         {issue.photo_url ? (
           <img className="sh-repcard__img" src={issue.photo_url} alt="" />
         ) : (
-          <span className="sh-repcard__noimg" style={{ fontSize: tokens.fontSize.xs }}>
-            {t("no_photo")}
-          </span>
+          <Icon id={categoryIcon(issue.category_code)} size={26} />
         )}
       </div>
 
@@ -197,7 +198,8 @@ export function StatusBadge({ status }: { status: Issue["status"] }) {
   return (
     <span
       className="sh-badge"
-      style={{ backgroundColor: STATUS_COLOR[status], fontSize: tokens.fontSize.xs }}
+      data-status={status}
+      style={{ fontSize: tokens.fontSize.xs }}
     >
       {t(STATUS_KEY[status])}
     </span>

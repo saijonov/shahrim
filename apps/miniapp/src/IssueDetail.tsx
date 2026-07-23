@@ -9,6 +9,8 @@ import type {
 import tokens from "@shahrim/ui-tokens";
 import { StatusBadge } from "./MyReports";
 import { STATUS_KEY, formatDateTime } from "./lib/status";
+import { Icon } from "./components/Icon";
+import { categoryIcon } from "./lib/categoryIcons";
 
 const TOKEN_KEY = "shahrim_token";
 
@@ -70,7 +72,8 @@ export function IssueDetail({ id, onExit }: IssueDetailProps) {
           onClick={onExit}
           aria-label={t("back")}
         >
-          ← {t("back")}
+          <Icon id="ic-back" size={18} />
+          {t("back")}
         </button>
       </div>
 
@@ -157,7 +160,14 @@ function Body({ issue, client }: { issue: IssueDetailData; client: ApiClient }) 
           <dt className="sh-meta" style={{ fontSize: tokens.fontSize.sm }}>
             {t("category")}
           </dt>
-          <dd style={{ fontSize: tokens.fontSize.base }}>{categoryName}</dd>
+          <dd style={{ fontSize: tokens.fontSize.base }}>
+            <Icon
+              id={categoryIcon(issue.category_code)}
+              size={18}
+              className="sh-facts__ic"
+            />
+            {categoryName}
+          </dd>
         </div>
 
         {issue.urgency && (

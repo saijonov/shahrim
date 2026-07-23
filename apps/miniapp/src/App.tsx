@@ -6,6 +6,8 @@ import tokens from "@shahrim/ui-tokens";
 import { ReportFlow } from "./ReportFlow";
 import { MyReports } from "./MyReports";
 import { IssueDetail } from "./IssueDetail";
+import { Icon } from "./components/Icon";
+import spriteMarkup from "./assets/sprite.svg?raw";
 import "./i18n";
 
 type Phase = "init" | "no_telegram" | "loading" | "error" | "ready";
@@ -56,25 +58,32 @@ export function App() {
     void runAuth();
   }, [runAuth]);
 
+  // The wordmark heads the login/onboarding states and the home screen; the
+  // report/history/detail screens carry their own back-button headers instead.
+  const showBrand = !(phase === "ready" && screen !== "home");
+
   return (
     <div className="sh-app">
-      <div className="sh-topbar" aria-hidden="true" />
+      <div
+        className="sh-sprite"
+        aria-hidden="true"
+        dangerouslySetInnerHTML={{ __html: spriteMarkup }}
+      />
       <main
         className="sh-main"
         style={{ padding: tokens.space[6], gap: tokens.space[6] }}
       >
-        <header className="sh-brandrow" style={{ gap: tokens.space[3] }}>
-          <span className="sh-tile" aria-hidden="true" />
-          <h1
-            className="sh-wordmark"
-            style={{
-              fontFamily: tokens.font.display,
-              fontSize: tokens.fontSize["2xl"],
-            }}
-          >
-            {t("app_name")}
-          </h1>
-        </header>
+        {showBrand ? (
+          <header className="sh-brandrow" style={{ gap: tokens.space[3] }}>
+            <Icon id="logo-mark" size={32} className="sh-logo" />
+            <h1
+              className="sh-wordmark"
+              style={{ fontSize: tokens.fontSize["2xl"] }}
+            >
+              {t("app_name")}
+            </h1>
+          </header>
+        ) : null}
 
         {renderBody()}
       </main>
@@ -158,17 +167,10 @@ export function App() {
       const firstName = user?.first_name?.trim();
       return (
         <>
-          <section
-            className="sh-card"
-            style={{
-              padding: tokens.space[6],
-              borderRadius: tokens.radius.lg,
-              gap: tokens.space[2],
-            }}
-          >
+          <section className="sh-hello" style={{ gap: tokens.space[2] }}>
             <p
               className="sh-greeting"
-              style={{ fontSize: tokens.fontSize.xl }}
+              style={{ fontSize: tokens.fontSize["2xl"] }}
             >
               {firstName
                 ? t("greeting", { name: firstName })
@@ -184,10 +186,10 @@ export function App() {
           <div className="sh-actions" style={{ gap: tokens.space[4] }}>
             <button
               type="button"
-              className="sh-btn sh-btn--primary"
+              className="sh-btn sh-btn--primary sh-cta"
               style={{
-                padding: `${tokens.space[5]}px ${tokens.space[6]}px`,
-                borderRadius: tokens.radius.lg,
+                padding: `${tokens.space[6]}px`,
+                borderRadius: tokens.radius.xl,
                 fontSize: tokens.fontSize.lg,
               }}
               onClick={() => {
@@ -195,14 +197,17 @@ export function App() {
                 setScreen("report");
               }}
             >
-              {t("report_problem")}
+              <span className="sh-cta__badge" aria-hidden="true">
+                <Icon id="ic-camera" size={30} />
+              </span>
+              <span className="sh-cta__label">{t("report_problem")}</span>
             </button>
             <button
               type="button"
-              className="sh-btn sh-btn--secondary"
+              className="sh-btn sh-btn--secondary sh-rowbtn"
               style={{
-                padding: `${tokens.space[5]}px ${tokens.space[6]}px`,
-                borderRadius: tokens.radius.lg,
+                padding: `${tokens.space[5]}px ${tokens.space[5]}px`,
+                borderRadius: tokens.radius.xl,
                 fontSize: tokens.fontSize.lg,
               }}
               onClick={() => {
@@ -210,7 +215,11 @@ export function App() {
                 setScreen("history");
               }}
             >
-              {t("my_reports")}
+              <span className="sh-rowbtn__badge" aria-hidden="true">
+                <Icon id="ic-doc" size={24} />
+              </span>
+              <span className="sh-rowbtn__label">{t("my_reports")}</span>
+              <Icon id="ic-chevright" size={22} className="sh-rowbtn__chev" />
             </button>
           </div>
 
