@@ -27,6 +27,12 @@ const localMessages = {
   optional: "Ixtiyoriy",
   // AI analysis (Phase 3) — heading above the suggested-description chips.
   ai_suggestions: "Tavsiya etilgan tavsiflar",
+  // My reports + detail (Phase 4) — strings not yet in the shared set.
+  // (status_*, cat_*, category, location, result_photo, urgency, back, loading,
+  //  retry and no_reports_yet are all reused from @shahrim/i18n.)
+  timeline: "Holatlar tarixi",
+  no_photo: "Surat yo'q",
+  load_error: "Murojaatlarni yuklashda xatolik yuz berdi. Qayta urinib ko'ring.",
 } as const;
 
 const translation = { ...messages, ...localMessages };

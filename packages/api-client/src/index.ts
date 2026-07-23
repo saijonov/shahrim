@@ -53,6 +53,23 @@ export interface Issue {
   updated_at: string;
 }
 
+export interface StatusHistoryEntry {
+  status: IssueStatus;
+  note: string | null;
+  created_at: string;
+}
+
+export interface Resolution {
+  result_photo_url: string | null;
+  note: string | null;
+  resolved_at: string;
+}
+
+export interface IssueDetail extends Issue {
+  status_history: StatusHistoryEntry[];
+  resolution: Resolution | null;
+}
+
 // ---- Client ----
 
 export interface ClientOptions {
@@ -112,6 +129,10 @@ export interface ApiClient {
   createIssue: (payload: IssueCreate) => Promise<Issue>;
   /** Run AI analysis on an uploaded photo (suggestions + category + urgency). */
   analyzePhoto: (photoUrl: string) => Promise<AnalysisResult>;
+  /** The current user's own reports, newest first. */
+  listMyIssues: () => Promise<Issue[]>;
+  /** One issue with its status timeline and resolution (owner-scoped). */
+  getIssue: (id: number) => Promise<IssueDetail>;
 }
 
 export function createClient(options: ClientOptions): ApiClient {
@@ -162,5 +183,7 @@ export function createClient(options: ClientOptions): ApiClient {
         method: "POST",
         body: JSON.stringify({ photo_url: photoUrl }),
       }),
+    listMyIssues: () => request<Issue[]>("/issues/mine"),
+    getIssue: (id: number) => request<IssueDetail>(`/issues/${id}`),
   };
 }

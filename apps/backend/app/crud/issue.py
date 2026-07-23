@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from geoalchemy2.elements import WKTElement
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Issue, StatusHistory
+from app.models import Issue, Resolution, StatusHistory
 from app.schemas.issue import IssueCreate
 
 
@@ -34,3 +35,34 @@ async def create_issue(session: AsyncSession, *, user_id: int, data: IssueCreate
     await session.commit()
     await session.refresh(issue)
     return issue
+
+
+async def list_my_issues(session: AsyncSession, user_id: int) -> list[Issue]:
+    result = await session.execute(
+        select(Issue)
+        .where(Issue.user_id == user_id)
+        .order_by(Issue.created_at.desc(), Issue.id.desc())
+    )
+    return list(result.scalars().all())
+
+
+async def get_issue(session: AsyncSession, issue_id: int) -> Issue | None:
+    return await session.get(Issue, issue_id)
+
+
+async def get_status_history(session: AsyncSession, issue_id: int) -> list[StatusHistory]:
+    result = await session.execute(
+        select(StatusHistory)
+        .where(StatusHistory.issue_id == issue_id)
+        .order_by(StatusHistory.created_at.asc(), StatusHistory.id.asc())
+    )
+    return list(result.scalars().all())
+
+
+async def get_resolution(session: AsyncSession, issue_id: int) -> Resolution | None:
+    result = await session.execute(
+        select(Resolution)
+        .where(Resolution.issue_id == issue_id)
+        .order_by(Resolution.resolved_at.desc())
+    )
+    return result.scalars().first()

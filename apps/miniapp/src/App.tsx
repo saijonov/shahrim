@@ -4,10 +4,12 @@ import { createClient } from "@shahrim/api-client";
 import type { User } from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
 import { ReportFlow } from "./ReportFlow";
+import { MyReports } from "./MyReports";
+import { IssueDetail } from "./IssueDetail";
 import "./i18n";
 
 type Phase = "init" | "no_telegram" | "loading" | "error" | "ready";
-type Screen = "home" | "report";
+type Screen = "home" | "report" | "history" | "detail";
 
 const TOKEN_KEY = "shahrim_token";
 
@@ -17,6 +19,7 @@ export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [screen, setScreen] = useState<Screen>("home");
+  const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
 
   const runAuth = useCallback(async () => {
     setNotice(null);
@@ -131,6 +134,27 @@ export function App() {
         return <ReportFlow onExit={() => setScreen("home")} />;
       }
 
+      if (screen === "history") {
+        return (
+          <MyReports
+            onExit={() => setScreen("home")}
+            onOpen={(id) => {
+              setSelectedIssueId(id);
+              setScreen("detail");
+            }}
+          />
+        );
+      }
+
+      if (screen === "detail" && selectedIssueId != null) {
+        return (
+          <IssueDetail
+            id={selectedIssueId}
+            onExit={() => setScreen("history")}
+          />
+        );
+      }
+
       const firstName = user?.first_name?.trim();
       return (
         <>
@@ -181,7 +205,10 @@ export function App() {
                 borderRadius: tokens.radius.lg,
                 fontSize: tokens.fontSize.lg,
               }}
-              onClick={() => setNotice(t("coming_soon"))}
+              onClick={() => {
+                setNotice(null);
+                setScreen("history");
+              }}
             >
               {t("my_reports")}
             </button>

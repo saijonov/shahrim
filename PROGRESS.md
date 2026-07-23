@@ -12,7 +12,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 | 1 | Telegram auth + user | ✅ |
 | 2 | Report flow (no AI) | ✅ |
 | 3 | AI pipeline (OpenAI GPT-4o vision) | ✅ |
-| 4 | My reports + statuses + notifications | ⬜ |
+| 4 | My reports + statuses + notifications | ✅ |
 | 5 | Admin portal (map, filters, analytics, resolve) | ⬜ |
 | 6 | Rating | ⬜ |
 | 7 | Native app (Expo) | ⬜ |
@@ -91,3 +91,20 @@ Ready to run: start the Mini App dev server + a cloudflared tunnel, set `MINIAPP
 
 ### Note
 Real GPT-4o analysis activates automatically once `OPENAI_API_KEY` is set in `.env` (dev currently uses the mock provider, so no key is required to run/test).
+
+---
+
+## Phase 4 — My reports + statuses + notifications
+
+**Goal:** the citizen sees their reports + a status timeline, and gets a Telegram message when a status changes.
+
+### Log
+- **Backend:** `GET /issues/mine` (the user's reports, newest first), `GET /issues/{id}` (owner-scoped detail: issue + `status_history` timeline + `resolution`). `change_issue_status()` service updates status, records a `StatusHistory` row, and fires an Uzbek Telegram notification. Notifications sent via the Bot API (`httpx` sendMessage), messages per PRD §11, non-blocking (a failure never blocks the status change). Files: `app/services/notifications.py`, `app/services/issue_status.py`.
+- **Mini App:** "Mening murojaatlarim" opens a **history list** (`MyReports.tsx`) — photo thumbnail, title, category, colored status badge, date, empty/loading/error states — and a **detail screen** (`IssueDetail.tsx`) with the photo, description, category, urgency, location, a newest-first **status timeline**, and a result-photo section when resolved. Status→color/label maps in `lib/status.ts`.
+
+### What was tested (all green)
+- Backend `pytest`: **37 passed** (adds: `/issues/mine` list + newest-first; detail with status history; other-user detail → 404; `/mine` requires auth; status-change service records history + notifies via a mocked sender; Uzbek status-message mapping incl. rejection reason). Re-runnable (fixed a test-isolation issue). `ruff` + format clean.
+- Mini App: `tsc --noEmit` clean; `vitest` **14 passed** (adds history list/badge/tap/empty/error + detail description/timeline/resolution). Workspace typecheck green.
+
+### Note
+The live "get a Telegram message on status change" is exercised end-to-end in Phase 5, when an admin resolves an issue (that action calls `change_issue_status`).

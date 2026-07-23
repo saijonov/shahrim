@@ -8,7 +8,14 @@ from app.crud import category as category_crud
 from app.crud import issue as issue_crud
 from app.db.session import get_session
 from app.models import Category, User
-from app.schemas.issue import AnalyzeRequest, IssueCreate, IssueOut
+from app.schemas.issue import (
+    AnalyzeRequest,
+    IssueCreate,
+    IssueDetailOut,
+    IssueOut,
+    ResolutionOut,
+    StatusHistoryOut,
+)
 from app.services.ai import AIProviderError, AnalysisResult, get_ai_provider
 from app.services.storage import Storage, StorageError, get_storage
 
@@ -73,3 +80,32 @@ async def create_issue(
         raise HTTPException(status_code=422, detail="Noto'g'ri turkum")
     issue = await issue_crud.create_issue(session, user_id=current_user.id, data=body)
     return IssueOut.model_validate(issue)
+
+
+@router.get("/issues/mine", response_model=list[IssueOut])
+async def list_my_issues(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> list[IssueOut]:
+    issues = await issue_crud.list_my_issues(session, current_user.id)
+    return [IssueOut.model_validate(i) for i in issues]
+
+
+@router.get("/issues/{issue_id}", response_model=IssueDetailOut)
+async def get_issue_detail(
+    issue_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> IssueDetailOut:
+    issue = await issue_crud.get_issue(session, issue_id)
+    if issue is None or issue.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Murojaat topilmadi")
+
+    history = await issue_crud.get_status_history(session, issue_id)
+    resolution = await issue_crud.get_resolution(session, issue_id)
+
+    return IssueDetailOut(
+        **IssueOut.model_validate(issue).model_dump(),
+        status_history=[StatusHistoryOut.model_validate(h) for h in history],
+        resolution=ResolutionOut.model_validate(resolution) if resolution else None,
+    )

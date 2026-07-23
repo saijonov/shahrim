@@ -37,3 +37,24 @@ class IssueOut(BaseModel):
     district: str | None
     created_at: datetime
     updated_at: datetime
+
+
+class StatusHistoryOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str
+    note: str | None
+    created_at: datetime
+
+
+class ResolutionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    result_photo_url: str | None
+    note: str | None
+    resolved_at: datetime
+
+
+class IssueDetailOut(IssueOut):
+    status_history: list[StatusHistoryOut] = []
+    resolution: ResolutionOut | None = None
