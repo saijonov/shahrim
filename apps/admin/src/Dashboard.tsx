@@ -7,6 +7,7 @@ import type { AdminIssue, Analytics, IssueFilters, MapPoint } from "./api";
 import { Filters } from "./Filters";
 import { IssueTable } from "./IssueTable";
 import { IssueDetailDrawer } from "./IssueDetailDrawer";
+import { Icon } from "./components/Icon";
 import { Spinner, ErrorRetry } from "./ui";
 
 // Code-split the two heaviest dependencies out of the initial bundle: the map
@@ -91,13 +92,13 @@ export function Dashboard({ adminName, onLogout }: DashboardProps) {
 
       <header className="adm-header">
         <div className="adm-brandrow" style={{ gap: tokens.space[3] }}>
-          <span className="adm-tile" aria-hidden="true" />
-          <h1
-            className="adm-wordmark"
-            style={{ fontFamily: tokens.font.display, fontSize: tokens.fontSize.xl }}
-          >
-            {t("admin_dashboard")}
-          </h1>
+          <Icon id="logo-mark" size={34} className="adm-logo" />
+          <div>
+            <h1 className="adm-wordmark" style={{ fontSize: tokens.fontSize.xl }}>
+              {t("app_name")}
+            </h1>
+            <p className="adm-brandsub">{t("admin_dashboard")}</p>
+          </div>
         </div>
         <div className="adm-header__right">
           {adminName ? <span className="adm-muted">{adminName}</span> : null}

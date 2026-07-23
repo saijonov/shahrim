@@ -6,15 +6,14 @@
 import { useTranslation } from "react-i18next";
 import type { IssueStatus, Urgency } from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
-import { STATUS_KEY, STATUS_COLOR, urgencyColor } from "./lib/status";
+import { STATUS_KEY, urgencyColor } from "./lib/status";
 
 export function StatusBadge({ status }: { status: IssueStatus }) {
   const { t } = useTranslation();
+  // Soft-tinted pill + colour-matched dot per status (colours live in the CSS,
+  // keyed off data-status) — matching the Mini App's badge.
   return (
-    <span
-      className="adm-badge"
-      style={{ background: STATUS_COLOR[status], fontSize: tokens.fontSize.xs }}
-    >
+    <span className="adm-badge" data-status={status} style={{ fontSize: tokens.fontSize.xs }}>
       {t(STATUS_KEY[status])}
     </span>
   );

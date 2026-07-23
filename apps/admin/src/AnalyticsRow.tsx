@@ -103,7 +103,7 @@ export function AnalyticsRow({ data }: AnalyticsRowProps) {
           <div className="adm-chart__body">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trendData} margin={{ top: 8, right: 12, bottom: 4, left: -16 }}>
-                <CartesianGrid stroke={tokens.color.border} strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid stroke={tokens.color.line} strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="date" tick={{ fill: axisColor, fontSize: 11 }} minTickGap={24} />
                 <YAxis tick={{ fill: axisColor, fontSize: 11 }} allowDecimals={false} width={40} />
                 <Tooltip />
@@ -125,7 +125,7 @@ export function AnalyticsRow({ data }: AnalyticsRowProps) {
           <div className="adm-chart__body">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryData} margin={{ top: 8, right: 12, bottom: 4, left: -16 }}>
-                <CartesianGrid stroke={tokens.color.border} strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid stroke={tokens.color.line} strokeDasharray="3 3" vertical={false} />
                 <XAxis
                   dataKey="name"
                   tick={{ fill: axisColor, fontSize: 10 }}

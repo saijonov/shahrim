@@ -4,6 +4,7 @@ import type { AdminUser } from "./api";
 import { Login } from "./Login";
 import { Dashboard } from "./Dashboard";
 import { Spinner } from "./ui";
+import spriteMarkup from "./assets/sprite.svg?raw";
 import "./i18n";
 
 type Phase = "booting" | "unauthed" | "authed";
@@ -57,27 +58,42 @@ export function App() {
     };
   }, [api]);
 
-  if (phase === "booting") {
+  // The shared SVG sprite (logo + icons) is injected once so any screen can
+  // reference its symbols via <use>. It is purely decorative / offscreen.
+  return (
+    <>
+      <div
+        className="adm-sprite"
+        aria-hidden="true"
+        dangerouslySetInnerHTML={{ __html: spriteMarkup }}
+      />
+      {renderScreen()}
+    </>
+  );
+
+  function renderScreen() {
+    if (phase === "booting") {
+      return (
+        <div className="adm-app">
+          <div className="adm-topbar" aria-hidden="true" />
+          <Spinner />
+        </div>
+      );
+    }
+
+    if (phase === "authed" && admin) {
+      return <Dashboard adminName={admin.first_name || admin.email} onLogout={logout} />;
+    }
+
     return (
-      <div className="adm-app">
-        <div className="adm-topbar" aria-hidden="true" />
-        <Spinner />
-      </div>
+      <Login
+        onSuccess={(me) => {
+          setAdmin(me);
+          setPhase("authed");
+        }}
+      />
     );
   }
-
-  if (phase === "authed" && admin) {
-    return <Dashboard adminName={admin.first_name || admin.email} onLogout={logout} />;
-  }
-
-  return (
-    <Login
-      onSuccess={(me) => {
-        setAdmin(me);
-        setPhase("authed");
-      }}
-    />
-  );
 }
 
 export default App;

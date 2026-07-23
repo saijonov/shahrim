@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import tokens from "@shahrim/ui-tokens";
 import { createAdminClient, isUnauthorized, setToken } from "./api";
 import type { AdminUser } from "./api";
+import { Icon } from "./components/Icon";
 
 export interface LoginProps {
   /** Called with the authenticated admin once login succeeds. */
@@ -44,17 +45,12 @@ export function Login({ onSuccess }: LoginProps) {
       <main className="adm-login">
         <form className="adm-login__card" onSubmit={handleSubmit}>
           <div className="adm-brandrow" style={{ gap: tokens.space[3] }}>
-            <span className="adm-tile" aria-hidden="true" />
+            <Icon id="logo-mark" size={38} className="adm-logo" />
             <div>
-              <h1
-                className="adm-wordmark"
-                style={{ fontFamily: tokens.font.display, fontSize: tokens.fontSize.xl }}
-              >
+              <h1 className="adm-wordmark" style={{ fontSize: tokens.fontSize.xl }}>
                 {t("app_name")}
               </h1>
-              <p className="adm-muted" style={{ fontSize: tokens.fontSize.sm }}>
-                {t("admin_dashboard")}
-              </p>
+              <p className="adm-brandsub">{t("admin_dashboard")}</p>
             </div>
           </div>
 
