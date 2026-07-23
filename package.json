@@ -1,0 +1,20 @@
+{
+  "name": "shahrim",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shahrim — civic issue-reporting platform for Samarkand (Telegram Mini App + native app + admin portal).",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "build": "turbo run build"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.2"
+  }
+}

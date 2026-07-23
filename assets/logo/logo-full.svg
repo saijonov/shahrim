@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" role="img" aria-label="Shahrim logo (placeholder)">
+  <rect width="480" height="120" rx="16" fill="#F5F2EC"/>
+  <!-- mark: Samarkand dome glyph -->
+  <g transform="translate(24 20)">
+    <rect x="0" y="0" width="80" height="80" rx="18" fill="#143C8C"/>
+    <path d="M40 14 C26 26 22 40 22 52 h36 c0 -12 -4 -26 -18 -38 Z" fill="#1CA5A0"/>
+    <rect x="22" y="52" width="36" height="14" fill="#F5F2EC"/>
+    <circle cx="40" cy="12" r="3.5" fill="#F5F2EC"/>
+  </g>
+  <!-- wordmark -->
+  <text x="128" y="60" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" fill="#16202E">Shahrim</text>
+  <text x="128" y="88" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#143C8C">LOGO — FULL (placeholder)</text>
+</svg>

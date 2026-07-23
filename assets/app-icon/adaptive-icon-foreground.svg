@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Android adaptive icon foreground (placeholder)">
+  <!-- transparent background; keep art inside the 66% safe zone -->
+  <g transform="translate(512 460)">
+    <path d="M0 -200 C-140 -40 -180 100 -180 200 h360 c0 -100 -40 -240 -180 -400 Z" fill="#1CA5A0"/>
+    <rect x="-180" y="200" width="360" height="120" fill="#143C8C"/>
+    <circle cx="0" cy="-224" r="26" fill="#143C8C"/>
+  </g>
+  <text x="512" y="880" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#143C8C">FOREGROUND</text>
+</svg>

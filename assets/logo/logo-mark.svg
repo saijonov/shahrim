@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Shahrim mark (placeholder)">
+  <rect width="120" height="120" rx="26" fill="#143C8C"/>
+  <path d="M60 22 C39 40 33 60 33 78 h54 c0 -18 -6 -38 -27 -56 Z" fill="#1CA5A0"/>
+  <rect x="33" y="78" width="54" height="18" fill="#F5F2EC"/>
+  <circle cx="60" cy="18" r="5" fill="#F5F2EC"/>
+  <text x="60" y="112" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#F5F2EC">MARK</text>
+</svg>

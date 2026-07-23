@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Shahrim favicon (placeholder)">
+  <rect width="64" height="64" rx="14" fill="#143C8C"/>
+  <path d="M32 12 C21 22 18 32 18 42 h28 c0 -10 -3 -20 -14 -30 z" fill="#1CA5A0"/>
+  <rect x="18" y="42" width="28" height="9" fill="#F5F2EC"/>
+  <circle cx="32" cy="10" r="3" fill="#F5F2EC"/>
+</svg>

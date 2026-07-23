@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 88" role="img" aria-label="Low urgency map pin (placeholder)">
+  <path d="M32 4 C16 4 4 16 4 32 c0 20 28 52 28 52 s28 -32 28 -52 C60 16 48 4 32 4 z" fill="#2E8B57" stroke="#16202E" stroke-width="2"/>
+  <circle cx="32" cy="30" r="12" fill="#F5F2EC"/>
+  <path d="M26 30 l4 5 8 -9" fill="none" stroke="#2E8B57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

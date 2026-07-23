@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 112" color="#143C8C" role="img" aria-label="Yo'l shikasti (road damage) — placeholder">
+  <g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 78 L36 18"/>
+    <path d="M78 78 L60 18"/>
+    <path d="M48 24 v8 M48 44 v8 M48 64 v6"/>
+    <path d="M44 40 l10 6 -8 8 10 6" stroke-dasharray="0"/>
+  </g>
+  <text x="48" y="104" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="600" fill="currentColor">Yo'l shikasti</text>
+</svg>

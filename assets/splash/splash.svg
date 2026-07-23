@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" role="img" aria-label="Shahrim splash screen (placeholder)">
+  <rect width="1080" height="1920" fill="#143C8C"/>
+  <g transform="translate(420 760)">
+    <rect x="0" y="0" width="240" height="240" rx="52" fill="#F5F2EC"/>
+    <path d="M120 44 C78 88 66 132 66 172 h108 c0 -40 -12 -84 -54 -128 Z" fill="#1CA5A0"/>
+    <rect x="66" y="172" width="108" height="36" fill="#143C8C"/>
+    <circle cx="120" cy="36" r="10" fill="#1CA5A0"/>
+  </g>
+  <text x="540" y="1120" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#F5F2EC">Shahrim</text>
+  <text x="540" y="1180" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" fill="#1CA5A0">SPLASH (placeholder)</text>
+</svg>
