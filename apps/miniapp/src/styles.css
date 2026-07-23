@@ -41,32 +41,7 @@
   --co-font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark (Samarkand night) */
-    --co-bg: #0d1622;
-    --co-card: #152238;
-    --co-card2: #1b2a44;
-    --co-text: #f1eee6;
-    --co-dim: #93a1b5;
-    --co-primary: #3f6fd8;
-    --co-primary-soft: #20304f;
-    --co-ink: #ffffff;
-    --co-accent: #26b7b1;
-    --co-accent-soft: #123330;
-    --co-border: rgba(255, 255, 255, 0.15);
-    --co-line: rgba(255, 255, 255, 0.09);
-    --co-gold: #d8b65e;
-    --co-shadow: rgba(0, 0, 0, 0.55);
-    --co-field: #101b2c;
-    --co-high: #e86152;
-    --co-med: #f0a63a;
-    --co-low: #4cb37e;
-    --co-high-soft: rgba(232, 97, 82, 0.16);
-    --co-med-soft: rgba(240, 166, 58, 0.16);
-    --co-low-soft: rgba(76, 179, 126, 0.16);
-  }
-}
+/* Bright (Samarkand paper) theme only — no dark override. */
 
 * {
   box-sizing: border-box;
@@ -95,24 +70,6 @@ body {
   background: var(--co-bg);
   color: var(--co-text);
   overflow: hidden;
-}
-
-/* Signature girih star-lattice, woven faintly behind everything. */
-.sh-app::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='52' viewBox='0 0 52 52'%3E%3Cg fill='none' stroke='%237C9AD6' stroke-width='0.8'%3E%3Cpath d='M0 26 26 0 52 26 26 52Z'/%3E%3Cpath d='M0 0 52 52M52 0 0 52'/%3E%3Cpath d='M26 0V52M0 26H52'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 52px 52px;
-  opacity: 0.35;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sh-app::before {
-    opacity: 0.16;
-  }
 }
 
 /* The offscreen sprite must never take up layout space. */
