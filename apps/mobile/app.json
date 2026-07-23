@@ -5,8 +5,10 @@
     "scheme": "shahrim",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": ["**/*"],
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "uz.shahrim.app",
@@ -40,7 +42,8 @@
         {
           "locationWhenInUsePermission": "Muammo joylashuvini aniqlash uchun joylashuvga ruxsat kerak."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": false

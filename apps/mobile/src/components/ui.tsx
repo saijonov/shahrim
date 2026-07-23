@@ -1,21 +1,18 @@
 /**
- * Small themed building blocks shared across screens. All colour/spacing/radii
- * come from the theme (ui-tokens); no hardcoded palette. Text content is always
- * passed in by callers (Uzbek via i18n).
+ * Small themed building blocks shared across screens. All colour/spacing/radii/
+ * type come from the (light-only) theme; no hardcoded palette. Text content is
+ * always passed in by callers (Uzbek via i18n). The visual language mirrors the
+ * bright Mini App: white rounded cards with a soft cool shadow, a cobalt primary
+ * button with a glow, quiet white secondary buttons, and soft-tinted status
+ * badges with a colour-matched dot.
  */
 import type { ReactNode } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import type { StyleProp, ViewStyle, TextStyle } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { IssueStatus } from "@shahrim/api-client";
 import { useTheme } from "../theme";
-import { STATUS_COLOR, STATUS_KEY } from "../lib/status";
+import { STATUS_KEY } from "../lib/status";
 
 export function Card({
   children,
@@ -31,11 +28,12 @@ export function Card({
         {
           backgroundColor: t.color.card,
           borderRadius: t.radius.lg,
-          borderWidth: StyleSheet.hairlineWidth,
+          borderWidth: 1,
           borderColor: t.color.border,
           padding: t.space[5],
           gap: t.space[3],
         },
+        t.cardShadow,
         style,
       ]}
     >
@@ -55,7 +53,12 @@ export function Title({
   return (
     <Text
       style={[
-        { color: t.color.text, fontSize: t.fontSize.xl, fontWeight: "700" },
+        {
+          color: t.color.text,
+          fontSize: t.fontSize.xl,
+          fontFamily: t.font.display,
+          letterSpacing: -0.3,
+        },
         style,
       ]}
     >
@@ -73,7 +76,12 @@ export function Subtitle({
 }) {
   const t = useTheme();
   return (
-    <Text style={[{ color: t.color.muted, fontSize: t.fontSize.base }, style]}>
+    <Text
+      style={[
+        { color: t.color.muted, fontSize: t.fontSize.base, fontFamily: t.font.medium },
+        style,
+      ]}
+    >
       {children}
     </Text>
   );
@@ -92,7 +100,10 @@ export function Meta({
   return (
     <Text
       numberOfLines={numberOfLines}
-      style={[{ color: t.color.muted, fontSize: t.fontSize.sm }, style]}
+      style={[
+        { color: t.color.muted, fontSize: t.fontSize.sm, fontFamily: t.font.medium },
+        style,
+      ]}
     >
       {children}
     </Text>
@@ -118,8 +129,8 @@ export function Button({
 }) {
   const t = useTheme();
   const isPrimary = variant === "primary";
-  const bg = isPrimary ? t.color.primary : "transparent";
-  const fg = isPrimary ? t.color.primaryText : t.color.primary;
+  const bg = isPrimary ? t.color.primary : t.color.card;
+  const fg = isPrimary ? t.color.primaryText : t.color.text;
   const isDisabled = disabled || loading;
 
   return (
@@ -132,22 +143,31 @@ export function Button({
         {
           backgroundColor: bg,
           borderRadius: t.radius.lg,
-          borderWidth: isPrimary ? 0 : 2,
-          borderColor: t.color.primary,
+          borderWidth: isPrimary ? 0 : 1.5,
+          borderColor: t.color.border,
           paddingVertical: t.space[4],
           paddingHorizontal: t.space[6],
           alignItems: "center",
           justifyContent: "center",
           minHeight: 56,
-          opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1,
+          transform: [{ translateY: pressed && !isDisabled ? 1 : 0 }],
+          opacity: isDisabled ? 0.5 : 1,
         },
+        // Only the primary button carries the cobalt glow.
+        isPrimary && !isDisabled ? t.primaryShadow : null,
         style,
       ]}
     >
       {loading ? (
         <ActivityIndicator color={fg} />
       ) : (
-        <Text style={{ color: fg, fontSize: t.fontSize.lg, fontWeight: "600" }}>
+        <Text
+          style={{
+            color: fg,
+            fontSize: t.fontSize.lg,
+            fontFamily: isPrimary ? t.font.bold : t.font.semibold,
+          }}
+        >
           {title}
         </Text>
       )}
@@ -159,7 +179,7 @@ export function Loading({ label }: { label?: string }) {
   const t = useTheme();
   return (
     <View style={{ alignItems: "center", gap: t.space[3], padding: t.space[8] }}>
-      <ActivityIndicator size="large" color={t.color.primary} />
+      <ActivityIndicator size="large" color={t.color.accent} />
       {label ? <Meta>{label}</Meta> : null}
     </View>
   );
@@ -181,6 +201,7 @@ export function ErrorView({
         style={{
           color: t.color.text,
           fontSize: t.fontSize.base,
+          fontFamily: t.font.medium,
           textAlign: "center",
         }}
       >
@@ -193,24 +214,40 @@ export function ErrorView({
   );
 }
 
+/** Soft-tinted status badge: pale background + colour-matched dot & label. */
 export function StatusBadge({ status }: { status: IssueStatus }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const c = theme.color;
+  const tone: Record<IssueStatus, { fg: string; bg: string }> = {
+    submitted: { fg: c.dim, bg: c.line },
+    in_review: { fg: c.primary, bg: c.primarySoft },
+    in_progress: { fg: c.med, bg: c.medSoft },
+    resolved: { fg: c.low, bg: c.lowSoft },
+    rejected: { fg: c.high, bg: c.highSoft },
+  };
+  const { fg, bg } = tone[status];
   return (
     <View
       style={{
-        backgroundColor: STATUS_COLOR[status],
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+        backgroundColor: bg,
         borderRadius: theme.radius.pill,
-        paddingVertical: theme.space[1],
+        paddingVertical: 5,
         paddingHorizontal: theme.space[3],
         alignSelf: "flex-start",
       }}
     >
+      <View
+        style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: fg }}
+      />
       <Text
         style={{
-          color: "#FFFFFF",
+          color: fg,
           fontSize: theme.fontSize.xs,
-          fontWeight: "600",
+          fontFamily: theme.font.bold,
         }}
       >
         {t(STATUS_KEY[status])}

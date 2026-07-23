@@ -4,6 +4,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Text,
   TextInput,
   View,
 } from "react-native";
@@ -35,6 +36,19 @@ const CATEGORY_CODES = [
 
 const DEFAULT_CATEGORY = "other";
 const URGENCIES: Urgency[] = ["low", "medium", "high"];
+
+/** Decorative category glyphs (echo the Mini App's icon tiles; purely visual). */
+const CATEGORY_EMOJI: Record<string, string> = {
+  road_damage: "🛣️",
+  street_light: "💡",
+  garbage: "🗑️",
+  water_leak: "💧",
+  sewage: "🚽",
+  damaged_sign: "🚧",
+  fallen_tree: "🌳",
+  public_transport: "🚌",
+  other: "📌",
+};
 
 /**
  * Report flow (PRD §6.2), mirroring the Mini App's ReportFlow as one scrollable
@@ -239,19 +253,38 @@ export function ReportScreen() {
       <ScrollView
         contentContainerStyle={{
           padding: theme.space[6],
-          gap: theme.space[6],
+          gap: theme.space[5],
           flexGrow: 1,
+          alignItems: "center",
           justifyContent: "center",
           backgroundColor: theme.color.bg,
         }}
       >
-        <Card style={{ alignItems: "center" }}>
-          <Title style={{ color: theme.color.accent, fontSize: theme.fontSize["3xl"] }}>
+        {/* Green success mark with a soft ring (mirrors the Mini App). */}
+        <View
+          style={{
+            width: 88,
+            height: 88,
+            borderRadius: 999,
+            backgroundColor: theme.color.low,
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: 12,
+            borderColor: theme.color.lowSoft,
+          }}
+        >
+          <Text style={{ color: "#FFFFFF", fontSize: 44, fontFamily: theme.font.bold }}>
             ✓
-          </Title>
-          <Title style={{ textAlign: "center" }}>{t("submitted_success")}</Title>
-          <Button title={t("done")} onPress={() => router.replace("/home")} />
-        </Card>
+          </Text>
+        </View>
+        <Title style={{ textAlign: "center", fontSize: theme.fontSize["2xl"] }}>
+          {t("submitted_success")}
+        </Title>
+        <Button
+          title={t("done")}
+          onPress={() => router.replace("/home")}
+          style={{ alignSelf: "stretch" }}
+        />
       </ScrollView>
     );
   }
@@ -274,14 +307,14 @@ export function ReportScreen() {
           <View style={{ gap: theme.space[3] }}>
             <View
               style={{
-                borderRadius: theme.radius.lg,
+                borderRadius: theme.radius.xl,
                 overflow: "hidden",
-                backgroundColor: theme.color.border,
+                backgroundColor: theme.color.card2,
               }}
             >
               <Image
                 source={{ uri: previewUri }}
-                style={{ width: "100%", height: 240 }}
+                style={{ width: "100%", height: 260 }}
                 resizeMode="cover"
               />
               {busy ? (
@@ -294,7 +327,7 @@ export function ReportScreen() {
                     bottom: 0,
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "rgba(0,0,0,0.45)",
+                    backgroundColor: "rgba(20,60,140,0.42)",
                   }}
                 >
                   <Loading label={uploading ? t("uploading") : t("analyzing")} />
@@ -318,6 +351,38 @@ export function ReportScreen() {
           </View>
         ) : (
           <View style={{ gap: theme.space[3] }}>
+            {/* Dashed dropzone-style prompt above the pick buttons. */}
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                gap: theme.space[3],
+                minHeight: 220,
+                paddingVertical: theme.space[6],
+                paddingHorizontal: theme.space[5],
+                backgroundColor: theme.color.card2,
+                borderWidth: 2,
+                borderStyle: "dashed",
+                borderColor: theme.color.border,
+                borderRadius: theme.radius.xl,
+              }}
+            >
+              <View
+                style={{
+                  width: 84,
+                  height: 84,
+                  borderRadius: theme.radius.xl,
+                  backgroundColor: theme.color.primarySoft,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 40 }}>📷</Text>
+              </View>
+              <Meta style={{ textAlign: "center", fontSize: theme.fontSize.base }}>
+                {t("add_photo")}
+              </Meta>
+            </View>
             <Button title={t("camera")} onPress={() => void pickFromCamera()} />
             <Button
               title={t("gallery")}
@@ -333,12 +398,19 @@ export function ReportScreen() {
 
       {/* Description + AI suggestions */}
       <View style={{ gap: theme.space[3] }}>
-        <Subtitle style={{ color: theme.color.text, fontWeight: "600" }}>
+        <Subtitle
+          style={{
+            color: theme.color.text,
+            fontFamily: theme.font.semibold,
+          }}
+        >
           {t("describe_problem")}
         </Subtitle>
         {suggestions.length > 0 ? (
           <View style={{ gap: theme.space[2] }}>
-            <Meta>{t("ai_suggestions")}</Meta>
+            <Meta style={{ color: theme.color.accent, fontFamily: theme.font.bold }}>
+              ✦ {t("ai_suggestions")}
+            </Meta>
             <View style={{ gap: theme.space[2] }}>
               {suggestions.map((s, i) => {
                 const selected = description === s;
@@ -350,20 +422,25 @@ export function ReportScreen() {
                     accessibilityState={{ selected }}
                     style={{
                       borderWidth: 1.5,
-                      borderColor: selected ? theme.color.accent : theme.color.border,
-                      backgroundColor: selected ? theme.color.accent : theme.color.card,
+                      borderColor: theme.color.accent,
+                      backgroundColor: selected
+                        ? theme.color.accent
+                        : theme.color.accentSoft,
                       borderRadius: theme.radius.md,
-                      padding: theme.space[3],
+                      paddingVertical: theme.space[3],
+                      paddingHorizontal: theme.space[4],
                     }}
                   >
-                    <Meta
+                    <Text
                       style={{
-                        color: selected ? theme.color.onAccent : theme.color.text,
+                        color: selected ? "#FFFFFF" : theme.color.accent,
                         fontSize: theme.fontSize.base,
+                        fontFamily: theme.font.semibold,
+                        lineHeight: 21,
                       }}
                     >
                       {s}
-                    </Meta>
+                    </Text>
                   </Pressable>
                 );
               })}
@@ -378,26 +455,36 @@ export function ReportScreen() {
           multiline
           numberOfLines={4}
           style={{
-            minHeight: 100,
-            borderWidth: 1,
+            minHeight: 116,
+            borderWidth: 1.5,
             borderColor: theme.color.border,
             borderRadius: theme.radius.md,
-            padding: theme.space[3],
+            padding: theme.space[4],
             color: theme.color.text,
             fontSize: theme.fontSize.base,
-            backgroundColor: theme.color.card,
+            fontFamily: theme.font.body,
+            backgroundColor: theme.color.field,
             textAlignVertical: "top",
           }}
         />
         <Meta>{t("optional")}</Meta>
       </View>
 
-      {/* Category */}
+      {/* Category — 3-column icon tiles. */}
       <View style={{ gap: theme.space[3] }}>
-        <Subtitle style={{ color: theme.color.text, fontWeight: "600" }}>
+        <Subtitle
+          style={{ color: theme.color.text, fontFamily: theme.font.semibold }}
+        >
           {t("category")}
         </Subtitle>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: theme.space[2] }}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            rowGap: theme.space[2],
+          }}
+        >
           {shownCategories.map((cat) => {
             const selected = cat.code === categoryCode;
             return (
@@ -407,37 +494,59 @@ export function ReportScreen() {
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 style={{
-                  borderWidth: 1.5,
+                  width: "31.5%",
+                  minHeight: 88,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: theme.space[2],
+                  paddingVertical: theme.space[3],
+                  paddingHorizontal: theme.space[1],
+                  borderWidth: 2,
                   borderColor: selected ? theme.color.primary : theme.color.border,
-                  backgroundColor: selected ? theme.color.primary : theme.color.card,
+                  backgroundColor: selected
+                    ? theme.color.primarySoft
+                    : theme.color.card,
                   borderRadius: theme.radius.md,
-                  paddingVertical: theme.space[2],
-                  paddingHorizontal: theme.space[3],
                 }}
               >
-                <Meta
+                <Text style={{ fontSize: 24 }}>
+                  {CATEGORY_EMOJI[cat.code] ?? CATEGORY_EMOJI.other}
+                </Text>
+                <Text
+                  numberOfLines={2}
                   style={{
-                    color: selected ? theme.color.primaryText : theme.color.text,
-                    fontSize: theme.fontSize.sm,
+                    textAlign: "center",
+                    fontSize: theme.fontSize.xs,
+                    lineHeight: 14,
+                    fontFamily: theme.font.semibold,
+                    color: selected ? theme.color.primary : theme.color.text,
                   }}
                 >
                   {cat.name_uz}
-                </Meta>
+                </Text>
               </Pressable>
             );
           })}
         </View>
       </View>
 
-      {/* Urgency */}
+      {/* Urgency — segmented, tinted by level. */}
       <View style={{ gap: theme.space[3] }}>
-        <Subtitle style={{ color: theme.color.text, fontWeight: "600" }}>
+        <Subtitle
+          style={{ color: theme.color.text, fontFamily: theme.font.semibold }}
+        >
           {t("urgency")}
         </Subtitle>
         <View style={{ flexDirection: "row", gap: theme.space[2] }}>
           {URGENCIES.map((u) => {
             const selected = urgency === u;
             const c = theme.urgencyColor[u];
+            const soft =
+              u === "high"
+                ? theme.color.highSoft
+                : u === "medium"
+                  ? theme.color.medSoft
+                  : theme.color.lowSoft;
             return (
               <Pressable
                 key={u}
@@ -447,22 +556,22 @@ export function ReportScreen() {
                 style={{
                   flex: 1,
                   alignItems: "center",
-                  borderWidth: 2,
+                  borderWidth: 1.5,
                   borderColor: c,
-                  backgroundColor: selected ? c : "transparent",
+                  backgroundColor: selected ? c : soft,
                   borderRadius: theme.radius.md,
                   paddingVertical: theme.space[3],
                 }}
               >
-                <Meta
+                <Text
                   style={{
-                    color: selected ? "#FFFFFF" : theme.color.text,
+                    color: selected ? "#FFFFFF" : c,
                     fontSize: theme.fontSize.sm,
-                    fontWeight: "600",
+                    fontFamily: theme.font.bold,
                   }}
                 >
                   {t(`urgency_${u}`)}
-                </Meta>
+                </Text>
               </Pressable>
             );
           })}
@@ -471,7 +580,9 @@ export function ReportScreen() {
 
       {/* Location */}
       <View style={{ gap: theme.space[3] }}>
-        <Subtitle style={{ color: theme.color.text, fontWeight: "600" }}>
+        <Subtitle
+          style={{ color: theme.color.text, fontFamily: theme.font.semibold }}
+        >
           {t("location")}
         </Subtitle>
         {locating || lat == null || lng == null ? (

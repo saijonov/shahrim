@@ -45,8 +45,10 @@ export default function MapPicker({ lat, lng, onChange }: MapPickerProps) {
 
 const styles = StyleSheet.create({
   wrap: {
-    height: 220,
-    borderRadius: 16,
+    height: 260,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: "rgba(20,32,46,0.13)",
     overflow: "hidden",
   },
 });

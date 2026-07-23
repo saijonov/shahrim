@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Image, Pressable, ScrollView, TextInput, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { IssueDetail, RatingInfo } from "@shahrim/api-client";
 import { client } from "../api";
@@ -92,9 +92,11 @@ function Body({ issue }: { issue: IssueDetail }) {
     <View style={{ gap: theme.space[5] }}>
       <View
         style={{
-          borderRadius: theme.radius.lg,
+          borderRadius: theme.radius.xl,
           overflow: "hidden",
-          backgroundColor: theme.color.border,
+          backgroundColor: theme.color.card2,
+          borderWidth: 1,
+          borderColor: theme.color.border,
           alignItems: "center",
           justifyContent: "center",
           minHeight: 200,
@@ -135,9 +137,11 @@ function Body({ issue }: { issue: IssueDetail }) {
         ) : null}
       </Card>
 
-      {/* Resolution — the city's result photo + note. */}
+      {/* Resolution — the city's result photo + note (green-tinted). */}
       {issue.resolution ? (
-        <Card>
+        <Card
+          style={{ backgroundColor: theme.color.lowSoft, borderColor: theme.color.low }}
+        >
           <Title style={{ fontSize: theme.fontSize.lg }}>{t("result_photo")}</Title>
           {resultPhoto ? (
             <View style={{ borderRadius: theme.radius.md, overflow: "hidden" }}>
@@ -159,42 +163,70 @@ function Body({ issue }: { issue: IssueDetail }) {
       {/* Rating (PRD §6.4) — only for resolved issues. */}
       {issue.status === "resolved" ? <RatingSection issue={issue} /> : null}
 
-      {/* Status timeline (newest first). */}
+      {/* Status timeline (newest first) — a cobalt thread of dots. */}
       {timeline.length > 0 ? (
-        <View style={{ gap: theme.space[3] }}>
+        <Card>
           <Title style={{ fontSize: theme.fontSize.lg }}>{t("timeline")}</Title>
-          <View style={{ gap: theme.space[3] }}>
-            {timeline.map((entry, i) => (
-              <View
-                key={i}
-                style={{ flexDirection: "row", gap: theme.space[3] }}
-              >
+          <View style={{ gap: 0 }}>
+            {timeline.map((entry, i) => {
+              const last = i === timeline.length - 1;
+              return (
                 <View
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    marginTop: 6,
-                    backgroundColor: theme.color.accent,
-                  }}
-                />
-                <View style={{ flex: 1, gap: theme.space[1] }}>
-                  <Meta
-                    style={{ color: theme.color.text, fontSize: theme.fontSize.base }}
+                  key={i}
+                  style={{ flexDirection: "row", gap: theme.space[3] }}
+                >
+                  {/* Left rail: dot + connective line down to the next item. */}
+                  <View style={{ width: 14, alignItems: "center" }}>
+                    <View
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: 6,
+                        marginTop: 4,
+                        backgroundColor: theme.color.primary,
+                        borderWidth: 3,
+                        borderColor: theme.color.bg,
+                      }}
+                    />
+                    {!last ? (
+                      <View
+                        style={{
+                          flex: 1,
+                          width: 2,
+                          marginTop: 2,
+                          backgroundColor: theme.color.border,
+                        }}
+                      />
+                    ) : null}
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      gap: theme.space[1],
+                      paddingBottom: last ? 0 : theme.space[4],
+                    }}
                   >
-                    {t(STATUS_KEY[entry.status])}
-                  </Meta>
-                  <Meta style={{ fontSize: theme.fontSize.xs }}>
-                    {formatDateTime(entry.created_at)}
-                  </Meta>
-                  {entry.note ? (
-                    <Meta style={{ fontSize: theme.fontSize.sm }}>{entry.note}</Meta>
-                  ) : null}
+                    <Meta
+                      style={{
+                        color: theme.color.text,
+                        fontSize: theme.fontSize.base,
+                        fontFamily: theme.font.bold,
+                      }}
+                    >
+                      {t(STATUS_KEY[entry.status])}
+                    </Meta>
+                    <Meta style={{ fontSize: theme.fontSize.xs }}>
+                      {formatDateTime(entry.created_at)}
+                    </Meta>
+                    {entry.note ? (
+                      <Meta style={{ fontSize: theme.fontSize.sm }}>{entry.note}</Meta>
+                    ) : null}
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
-        </View>
+        </Card>
       ) : null}
     </View>
   );
@@ -244,7 +276,7 @@ function RatingSection({ issue }: { issue: IssueDetail }) {
 
   if (rating) {
     return (
-      <Card>
+      <Card style={{ backgroundColor: theme.color.card2 }}>
         <Title style={{ fontSize: theme.fontSize.lg }}>
           {justSubmitted ? t("thank_you") : t("your_rating")}
         </Title>
@@ -259,7 +291,7 @@ function RatingSection({ issue }: { issue: IssueDetail }) {
   }
 
   return (
-    <Card>
+    <Card style={{ backgroundColor: theme.color.card2 }}>
       <Title style={{ fontSize: theme.fontSize.lg }}>{t("rate_resolution")}</Title>
       <StarRow value={stars} onChange={setStars} disabled={sending} />
       <TextInput
@@ -270,14 +302,15 @@ function RatingSection({ issue }: { issue: IssueDetail }) {
         editable={!sending}
         multiline
         style={{
-          minHeight: 72,
-          borderWidth: 1,
+          minHeight: 80,
+          borderWidth: 1.5,
           borderColor: theme.color.border,
           borderRadius: theme.radius.md,
-          padding: theme.space[3],
+          padding: theme.space[4],
           color: theme.color.text,
           fontSize: theme.fontSize.base,
-          backgroundColor: theme.color.card,
+          fontFamily: theme.font.body,
+          backgroundColor: theme.color.field,
           textAlignVertical: "top",
         }}
       />
@@ -315,14 +348,15 @@ function StarRow({
       {[1, 2, 3, 4, 5].map((n) => {
         const filled = value >= n;
         const star = (
-          <Title
+          <Text
             style={{
-              fontSize: theme.fontSize["2xl"],
-              color: filled ? theme.urgencyColor.medium : theme.color.muted,
+              fontSize: readOnly ? 26 : 34,
+              lineHeight: readOnly ? 32 : 40,
+              color: filled ? theme.color.gold : theme.color.border,
             }}
           >
             {filled ? "★" : "☆"}
-          </Title>
+          </Text>
         );
         if (readOnly) return <View key={n}>{star}</View>;
         return (

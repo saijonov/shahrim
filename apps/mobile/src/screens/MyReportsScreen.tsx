@@ -115,7 +115,7 @@ function IssueCard({ issue, onPress }: { issue: Issue; onPress: () => void }) {
             height: 64,
             borderRadius: theme.radius.md,
             overflow: "hidden",
-            backgroundColor: theme.color.border,
+            backgroundColor: theme.color.primarySoft,
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -123,12 +123,20 @@ function IssueCard({ issue, onPress }: { issue: Issue; onPress: () => void }) {
           {thumb ? (
             <Image source={{ uri: thumb }} style={{ width: 64, height: 64 }} />
           ) : (
-            <Meta style={{ fontSize: theme.fontSize.xs }}>{t("no_photo")}</Meta>
+            <Meta
+              style={{ fontSize: theme.fontSize.xs, color: theme.color.primary }}
+            >
+              {t("no_photo")}
+            </Meta>
           )}
         </View>
         <View style={{ flex: 1, gap: theme.space[1] }}>
           <Meta
-            style={{ color: theme.color.text, fontSize: theme.fontSize.base }}
+            style={{
+              color: theme.color.text,
+              fontSize: theme.fontSize.base,
+              fontFamily: theme.font.display,
+            }}
             numberOfLines={2}
           >
             {title}

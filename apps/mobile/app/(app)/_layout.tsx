@@ -19,11 +19,16 @@ export default function AppLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: theme.color.card },
-        headerTitleStyle: { color: theme.color.text },
-        headerTintColor: theme.color.text,
+        headerStyle: { backgroundColor: theme.color.bg },
+        headerShadowVisible: false,
+        headerTitleStyle: {
+          color: theme.color.text,
+          fontFamily: theme.font.display,
+        },
+        headerTintColor: theme.color.primary,
         tabBarActiveTintColor: theme.color.primary,
         tabBarInactiveTintColor: theme.color.muted,
+        tabBarLabelStyle: { fontFamily: theme.font.medium },
         tabBarStyle: {
           backgroundColor: theme.color.card,
           borderTopColor: theme.color.border,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Linking, ScrollView, View } from "react-native";
+import { Linking, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as Crypto from "expo-crypto";
@@ -120,12 +120,40 @@ export function LoginScreen() {
         backgroundColor: theme.color.bg,
       }}
     >
-      <View style={{ gap: theme.space[3] }}>
-        <Title style={{ fontSize: theme.fontSize["2xl"] }}>{t("app_name")}</Title>
-        <Subtitle style={{ fontSize: theme.fontSize.lg, color: theme.color.text }}>
-          {t("onboarding_title")}
-        </Subtitle>
-        <Meta style={{ fontSize: theme.fontSize.base }}>{t("onboarding_body")}</Meta>
+      <View style={{ gap: theme.space[4] }}>
+        <View
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: theme.radius.lg,
+            backgroundColor: theme.color.primarySoft,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontSize: 32 }}>🏙️</Text>
+        </View>
+        <View style={{ gap: theme.space[2] }}>
+          <Title
+            style={{
+              fontSize: theme.fontSize["3xl"],
+              fontFamily: theme.font.displayExtra,
+              color: theme.color.primary,
+            }}
+          >
+            {t("app_name")}
+          </Title>
+          <Subtitle
+            style={{
+              fontSize: theme.fontSize.lg,
+              color: theme.color.text,
+              fontFamily: theme.font.semibold,
+            }}
+          >
+            {t("onboarding_title")}
+          </Subtitle>
+          <Meta style={{ fontSize: theme.fontSize.base }}>{t("onboarding_body")}</Meta>
+        </View>
       </View>
 
       {phase === "waiting" ? (
