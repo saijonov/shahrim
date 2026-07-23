@@ -9,6 +9,7 @@ from httpx import AsyncClient
 from app.core.config import settings
 from app.services.ai import get_ai_provider
 from app.services.ai.base import AnalysisResult, parse_analysis
+from app.services.ai.gemini_provider import GeminiProvider
 from app.services.ai.mock_provider import MockProvider
 from app.services.ai.openai_provider import OpenAIProvider
 from tests.helpers import build_init_data
@@ -82,6 +83,12 @@ def test_factory_uses_openai_with_key(monkeypatch: pytest.MonkeyPatch) -> None:
     assert isinstance(get_ai_provider(), OpenAIProvider)
 
 
+def test_factory_prefers_gemini_when_set(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(settings, "gemini_api_key", "g-test")
+    monkeypatch.setattr(settings, "openai_api_key", "sk-test")
+    assert isinstance(get_ai_provider(), GeminiProvider)
+
+
 # ---- analyze endpoint (uses MockProvider since no key in tests) ----
 
 
@@ -89,6 +96,7 @@ def test_factory_uses_openai_with_key(monkeypatch: pytest.MonkeyPatch) -> None:
 def _bot_token(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "telegram_bot_token", BOT_TOKEN)
     monkeypatch.setattr(settings, "openai_api_key", "")
+    monkeypatch.setattr(settings, "gemini_api_key", "")
 
 
 @pytest_asyncio.fixture

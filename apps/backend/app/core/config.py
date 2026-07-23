@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_model: str = "gpt-4o"
 
+    # AI / Google Gemini (AI Studio) — preferred when set.
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-flash-latest"
+
     # Admin portal (Phase 5) — an admin account is seeded on startup if both are set.
     admin_email: str = ""
     admin_password: str = ""

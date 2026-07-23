@@ -95,7 +95,7 @@ describe("ReportFlow (Phase 2 report flow)", () => {
     expect(screen.getByText("Iltimos, avval surat qo'shing.")).toBeInTheDocument();
   });
 
-  it("runs AI analysis after upload and shows suggestion chips that fill the description", async () => {
+  it("runs AI analysis after upload, auto-fills the description, and lets a chip change it", async () => {
     render(<ReportFlow onExit={vi.fn()} />);
 
     const input = screen.getByTestId("photo-input") as HTMLInputElement;
@@ -109,12 +109,14 @@ describe("ReportFlow (Phase 2 report flow)", () => {
     // Advance to the description step; the AI suggestion chips render.
     fireEvent.click(screen.getByText("Keyingi"));
     expect(await screen.findByText("Tavsiya etilgan tavsiflar")).toBeInTheDocument();
-    const chip = await screen.findByText("Yo'lda katta chuqur bor");
 
-    // Tapping a chip fills the (still editable) description textarea.
-    fireEvent.click(chip);
+    // The description is auto-filled with the AI's top suggestion (no typing needed).
     const textarea = screen.getByLabelText("Muammoni tavsiflang") as HTMLTextAreaElement;
     expect(textarea.value).toBe("Yo'lda katta chuqur bor");
+
+    // Tapping the other chip swaps in that suggestion (still fully editable).
+    fireEvent.click(screen.getByRole("button", { name: "Yo'l qoplamasi buzilgan" }));
+    expect(textarea.value).toBe("Yo'l qoplamasi buzilgan");
   });
 
   it("carries the AI-suggested category and urgency through to submit", async () => {

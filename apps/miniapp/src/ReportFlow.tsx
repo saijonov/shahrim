@@ -176,10 +176,16 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
           setPhotoUrl(null);
           setPhotoError(t("retake_photo"));
         } else {
-          setSuggestions(
-            Array.isArray(result.suggestions) ? result.suggestions.slice(0, 2) : [],
-          );
-          // Backend guarantees a valid code (defaults to "other").
+          const sugg = Array.isArray(result.suggestions)
+            ? result.suggestions.slice(0, 2)
+            : [];
+          setSuggestions(sugg);
+          // Auto-fill the description with the AI's top suggestion so the citizen
+          // needn't type anything (still fully editable). Don't clobber user input.
+          if (sugg.length > 0) {
+            setDescription((prev) => (prev.trim() ? prev : sugg[0]));
+          }
+          // Backend guarantees a valid code (defaults to "other") — auto-selected.
           if (result.category) setCategoryCode(result.category);
           setUrgency(result.urgency ?? null);
         }

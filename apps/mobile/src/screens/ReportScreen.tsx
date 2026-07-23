@@ -173,9 +173,15 @@ export function ReportScreen() {
           setPhotoUrl(null);
           setPhotoError(t("retake_photo"));
         } else {
-          setSuggestions(
-            Array.isArray(result.suggestions) ? result.suggestions.slice(0, 2) : [],
-          );
+          const sugg = Array.isArray(result.suggestions)
+            ? result.suggestions.slice(0, 2)
+            : [];
+          setSuggestions(sugg);
+          // Auto-fill description with the AI's top suggestion (still editable) so
+          // the citizen needn't type; don't overwrite anything already typed.
+          if (sugg.length > 0) {
+            setDescription((prev) => (prev.trim() ? prev : sugg[0]));
+          }
           if (result.category) setCategoryCode(result.category);
           if (result.urgency) setUrgency(result.urgency);
         }
