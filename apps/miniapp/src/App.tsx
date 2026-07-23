@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 import { createClient } from "@shahrim/api-client";
 import type { User } from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
+import { ReportFlow } from "./ReportFlow";
 import "./i18n";
 
 type Phase = "init" | "no_telegram" | "loading" | "error" | "ready";
+type Screen = "home" | "report";
 
 const TOKEN_KEY = "shahrim_token";
 
@@ -14,6 +16,7 @@ export function App() {
   const [phase, setPhase] = useState<Phase>("init");
   const [user, setUser] = useState<User | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [screen, setScreen] = useState<Screen>("home");
 
   const runAuth = useCallback(async () => {
     setNotice(null);
@@ -124,6 +127,10 @@ export function App() {
     }
 
     if (phase === "ready") {
+      if (screen === "report") {
+        return <ReportFlow onExit={() => setScreen("home")} />;
+      }
+
       const firstName = user?.first_name?.trim();
       return (
         <>
@@ -159,7 +166,10 @@ export function App() {
                 borderRadius: tokens.radius.lg,
                 fontSize: tokens.fontSize.lg,
               }}
-              onClick={() => setNotice(t("coming_soon"))}
+              onClick={() => {
+                setNotice(null);
+                setScreen("report");
+              }}
             >
               {t("report_problem")}
             </button>

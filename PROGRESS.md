@@ -10,7 +10,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 |---|---|---|
 | 0 | Foundation (repo, tooling, DB + migrations, health, assets, CI) | ✅ |
 | 1 | Telegram auth + user | ✅ |
-| 2 | Report flow (no AI) | ⬜ |
+| 2 | Report flow (no AI) | ✅ |
 | 3 | AI pipeline (OpenAI GPT-4o vision) | ⬜ |
 | 4 | My reports + statuses + notifications | ⬜ |
 | 5 | Admin portal (map, filters, analytics, resolve) | ⬜ |
@@ -57,3 +57,19 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 
 ### Live in-Telegram check (manual — you run it via the cloudflared tunnel)
 Ready to run: start the Mini App dev server + a cloudflared tunnel, set `MINIAPP_URL`, then in Telegram open the bot → `/start` → share phone → open app → confirm the home screen shows your name + phone. Steps provided in chat.
+
+---
+
+## Phase 2 — Report flow (no AI)
+
+**Goal:** a citizen submits a geo-located issue end-to-end in the Mini App: photo → description → category → location → submit.
+
+### Log
+- **Backend:** `POST /uploads` (multipart image, validated, saved via a `Storage` interface → local FS, served at `/media`), `POST /issues` (creates the issue with a PostGIS point from lat/lng, status `submitted`, and a `StatusHistory` row), `GET /categories`. Storage is behind an interface so S3 can drop in later. Files: `app/services/storage.py`, `app/crud/issue.py`, `app/crud/category.py`, `app/api/routes/{issues,categories}.py`.
+- **Mini App (`apps/miniapp`):** a 4-step report flow (`ReportFlow.tsx`) — photo capture (`capture=environment`) with **client-side canvas compression** (`lib/image.ts`, ≤1600px JPEG q0.8) → upload; always-editable description; category picker (from `/categories`, Uzbek fallback list); **geolocation with a Leaflet/OSM draggable-pin fallback** centered on Samarkand (`LocationMap.tsx`); submit → success screen. Vite proxies `/media` too, so photos render through the tunnel.
+- `@shahrim/api-client` gained `uploadPhoto()`, `createIssue()`, `listCategories()`.
+
+### What was tested (all green)
+- Backend `pytest`: **20 passed** (adds: categories list = 9; upload→create issue with PostGIS geometry populated + status-history row; create requires auth; upload rejects non-image; bad category → 422). `ruff` + format clean.
+- Mini App: `tsc --noEmit` clean; `vitest` **5 passed** (auth shell 2 + report flow 3). Full workspace typecheck (4 projects) green.
+- Live: `/categories` served by the running backend; report flow HMR-loaded into the Mini App behind the existing cloudflared tunnel.

@@ -208,3 +208,260 @@ body {
     animation: none;
   }
 }
+
+/* ── Report flow (Phase 2) ───────────────────────────────────────────── */
+
+.sh-flow {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.sh-flow__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sh-flow__body {
+  flex: 1 1 auto;
+}
+
+.sh-flow__foot {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sh-linkbtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  color: var(--sh-brand);
+  padding: 8px 4px;
+  min-height: 44px;
+}
+.sh-linkbtn:focus-visible {
+  outline: 3px solid var(--sh-accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Step indicator — quiet cobalt/turquoise dots. */
+.sh-steps {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sh-steps__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--sh-border);
+  transition: background 0.15s ease, width 0.15s ease;
+}
+.sh-steps__dot.is-done {
+  background: var(--sh-accent);
+}
+.sh-steps__dot.is-active {
+  width: 24px;
+  background: var(--sh-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sh-steps__dot {
+    transition: none;
+  }
+}
+
+.sh-step {
+  display: flex;
+  flex-direction: column;
+}
+.sh-step__title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--sh-fg);
+}
+
+.sh-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Photo capture */
+.sh-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 200px;
+  width: 100%;
+  cursor: pointer;
+  color: var(--sh-brand);
+  background: color-mix(in srgb, var(--sh-primary) 5%, var(--sh-card));
+  border: 2px dashed var(--sh-border);
+  border-radius: 16px;
+  font-family: inherit;
+  font-weight: 600;
+}
+.sh-dropzone:hover {
+  border-color: var(--sh-accent);
+}
+.sh-dropzone:focus-visible {
+  outline: 3px solid var(--sh-accent);
+  outline-offset: 2px;
+}
+.sh-dropzone__icon {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.sh-photo {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--sh-border);
+}
+.sh-photo__img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+}
+.sh-photo__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  background: rgba(20, 32, 46, 0.55);
+}
+
+/* Description */
+.sh-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 120px;
+  padding: 12px 14px;
+  font-family: inherit;
+  color: var(--sh-fg);
+  background: var(--sh-bg);
+  border: 2px solid var(--sh-border);
+}
+.sh-textarea:focus-visible {
+  outline: none;
+  border-color: var(--sh-accent);
+}
+
+/* Category chips */
+.sh-catgrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+.sh-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--sh-fg);
+  background: var(--sh-bg);
+  border: 2px solid var(--sh-border);
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.sh-chip:hover {
+  border-color: var(--sh-accent);
+}
+.sh-chip:focus-visible {
+  outline: 3px solid var(--sh-accent);
+  outline-offset: 2px;
+}
+.sh-chip.is-selected {
+  background: var(--sh-primary);
+  border-color: var(--sh-primary);
+  color: #fff;
+}
+.sh-chip__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sh-chip {
+    transition: none;
+  }
+}
+
+/* Location map */
+.sh-map {
+  width: 100%;
+  height: 300px;
+  border-radius: 16px;
+  border: 1px solid var(--sh-border);
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Self-contained cobalt teardrop pin (see LocationMap.tsx). */
+.sh-mappin {
+  background: none;
+  border: none;
+}
+.sh-mappin__body {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 3px;
+  background: var(--sh-primary);
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(20, 32, 46, 0.45);
+}
+
+.sh-error {
+  margin: 0;
+  color: var(--sh-urgency-high, #c0392b);
+  font-weight: 600;
+}
+
+.sh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Success screen */
+.sh-success {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+.sh-success__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: var(--sh-accent);
+  color: #fff;
+  font-size: 34px;
+  font-weight: 700;
+}

@@ -76,6 +76,20 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface UploadResponse {
+  photo_url: string;
+}
+
+export interface IssueCreate {
+  photo_url: string | null;
+  user_description: string;
+  category_code: string;
+  urgency?: Urgency | null;
+  lat: number | null;
+  lng: number | null;
+  address_text?: string | null;
+}
+
 export interface ApiClient {
   request: <T>(path: string, init?: RequestInit) => Promise<T>;
   health: () => Promise<{ status: string }>;
@@ -83,6 +97,12 @@ export interface ApiClient {
   authTelegram: (initData: string) => Promise<AuthResponse>;
   /** Current authenticated user (requires a token via getToken). */
   me: () => Promise<User>;
+  /** List the issue categories (reference data). */
+  listCategories: () => Promise<Category[]>;
+  /** Upload a photo (multipart); returns its stored URL. */
+  uploadPhoto: (file: File) => Promise<UploadResponse>;
+  /** Create an issue report. */
+  createIssue: (payload: IssueCreate) => Promise<Issue>;
 }
 
 export function createClient(options: ClientOptions): ApiClient {
@@ -120,5 +140,13 @@ export function createClient(options: ClientOptions): ApiClient {
         body: JSON.stringify({ init_data: initData }),
       }),
     me: () => request<User>("/me"),
+    listCategories: () => request<Category[]>("/categories"),
+    uploadPhoto: (file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      return request<UploadResponse>("/uploads", { method: "POST", body: form });
+    },
+    createIssue: (payload: IssueCreate) =>
+      request<Issue>("/issues", { method: "POST", body: JSON.stringify(payload) }),
   };
 }

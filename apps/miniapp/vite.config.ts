@@ -16,6 +16,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/api/, ""),
       },
+      // Uploaded photos come back as /media/photos/... — served verbatim by the
+      // backend, so this proxy passes the path through untouched (no rewrite).
+      "/media": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
     },
   },
 });

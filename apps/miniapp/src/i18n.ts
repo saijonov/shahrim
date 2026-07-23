@@ -14,6 +14,17 @@ const localMessages = {
   loading: "Yuklanmoqda...",
   auth_failed: "Tizimga kirishda xatolik yuz berdi. Qayta urinib ko'ring.",
   coming_soon: "Bu bo'lim tez orada ishga tushadi.",
+  // Report flow (Phase 2) — strings not yet in the shared @shahrim/i18n set.
+  add_photo: "Surat qo'shing",
+  retake: "Boshqa surat",
+  uploading: "Surat yuklanmoqda...",
+  getting_location: "Joylashuv aniqlanmoqda...",
+  location_hint: "Belgini kerakli joyga surib, aniq manzilni belgilang.",
+  select_on_map: "Joylashuvni aniqlab bo'lmadi. Xaritada joyni o'zingiz belgilang.",
+  photo_required: "Iltimos, avval surat qo'shing.",
+  report_error: "Murojaatni yuborishda xatolik yuz berdi. Qayta urinib ko'ring.",
+  sending: "Yuborilmoqda...",
+  optional: "Ixtiyoriy",
 } as const;
 
 const translation = { ...messages, ...localMessages };
