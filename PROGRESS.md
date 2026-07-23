@@ -16,7 +16,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done · ✅ * code-complete +
 | 5 | Admin portal (map, filters, analytics, resolve) | ✅ |
 | 6 | Rating | ✅ |
 | 7 | Native app (Expo) | ✅ * |
-| 8 | Polish & hardening | ⬜ |
+| 8 | Polish & hardening | ✅ |
 
 ---
 
@@ -154,4 +154,23 @@ The live "get a Telegram message on status change" is exercised end-to-end in Ph
 
 ### What was tested
 - **Static only (all green):** backend `pytest` **50 passed** (adds native exchange bound→token+one-time, unknown/pending→404); `ruff` clean. Mobile `tsc --noEmit` 0 errors + `jest-expo` **16 passed**. Full workspace typecheck (6 projects) green; Mini App 17 + admin 7 still pass.
-- **On-device verification pending (the ✅ * caveat):** no simulator/emulator exists in this environment, so the app was not run. The Telegram round-trip, camera upload, geolocation, and maps must be verified on a real phone via **Expo Go** — steps provided in chat. Runtime issues found there will be fixed in Phase 8.
+- **On-device verification pending (the ✅ * caveat):** no simulator/emulator exists in this environment, so the app was not run. The Telegram round-trip, camera upload, geolocation, and maps must be verified on a real phone via **Expo Go** — steps provided in chat. Any runtime issues found there will be fixed.
+
+---
+
+## Phase 8 — Polish & hardening
+
+**Goal:** clean, consistent, fully-Uzbek product ready for a pilot.
+
+### Log
+- **Backend hardening (PRD §16):** per-IP rate limiting on abuse-prone POST endpoints (`/issues`, `/uploads`, `/issues/analyze`, `/auth/telegram`, `/auth/native/exchange`, `/admin/auth/login`) returning `429` in Uzbek when exceeded; structured request logging middleware (method/path/status/duration). Self-contained (no new deps); toggle via `rate_limit_enabled` (off in tests).
+- **Admin bundle code-split:** Leaflet + `leaflet.heat` and Recharts are now `React.lazy`-loaded — the entry chunk dropped **778 KB → 222 KB** (login never loads the map/charts); the >500 KB build warning is gone.
+- **Copy/consistency:** scanned all app `src/` — no leftover TODO/placeholder/English UI text; every screen routes text through i18n (Uzbek Latin): 61 (miniapp) / 69 (admin) / 65 (mobile) `t(...)` calls. Empty/loading/error/success states present across flows.
+
+### What was tested (all green)
+- Backend `pytest`: **51 passed** (adds: `/admin/auth/login` rate-limited → 429 after the cap; normal 401 before). `ruff` + format clean; live `/health` OK with middleware active.
+- Admin: `tsc` clean, `vitest` **7 passed**, **build succeeds with no size warning** (entry 222 KB; map/charts in separate lazy chunks).
+- Full matrix green: backend 51 · Mini App 17 · mobile 16 · admin 7 = **91 automated tests**; workspace typecheck (6 projects) clean.
+
+### Store assets
+Placeholder brand/design assets + the swap-in checklist live in `assets/ASSETS.md` (icons, logos, splash, markers, illustrations) for the designer to replace by filename.

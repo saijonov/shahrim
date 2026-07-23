@@ -1,15 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Category } from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
 import { createAdminClient } from "./api";
 import type { AdminIssue, Analytics, IssueFilters, MapPoint } from "./api";
 import { Filters } from "./Filters";
-import { AnalyticsRow } from "./AnalyticsRow";
-import { IssueMap } from "./IssueMap";
 import { IssueTable } from "./IssueTable";
 import { IssueDetailDrawer } from "./IssueDetailDrawer";
 import { Spinner, ErrorRetry } from "./ui";
+
+// Code-split the two heaviest dependencies out of the initial bundle: the map
+// (Leaflet + leaflet.heat) and the analytics charts (Recharts) each load into
+// their own async chunk on demand, so the login + shell entry stays lean. The
+// `.then(m => ...)` unwraps the named export React.lazy expects as `default`.
+const AnalyticsRow = lazy(() =>
+  import("./AnalyticsRow").then((m) => ({ default: m.AnalyticsRow })),
+);
+const IssueMap = lazy(() => import("./IssueMap").then((m) => ({ default: m.IssueMap })));
 
 const PAGE_SIZE = 20;
 
@@ -104,7 +111,15 @@ export function Dashboard({ adminName, onLogout }: DashboardProps) {
         <Filters categories={categories} value={filters} onChange={setFilters} />
 
         {analytics ? (
-          <AnalyticsRow data={analytics} />
+          <Suspense
+            fallback={
+              <div className="adm-card" style={{ padding: tokens.space[6] }}>
+                <Spinner />
+              </div>
+            }
+          >
+            <AnalyticsRow data={analytics} />
+          </Suspense>
         ) : (
           <div className="adm-card" style={{ padding: tokens.space[6] }}>
             <Spinner />
@@ -113,7 +128,15 @@ export function Dashboard({ adminName, onLogout }: DashboardProps) {
 
         <div className="adm-split">
           <section className="adm-card adm-mapcard" aria-label={t("map_title")}>
-            <IssueMap points={points} onSelect={setSelectedId} />
+            <Suspense
+              fallback={
+                <div className="adm-center adm-map" style={{ padding: tokens.space[6] }}>
+                  <Spinner />
+                </div>
+              }
+            >
+              <IssueMap points={points} onSelect={setSelectedId} />
+            </Suspense>
           </section>
 
           <div className="adm-split__side">

@@ -14,6 +14,7 @@ from app.api.routes import auth as auth_routes
 from app.api.routes import categories as category_routes
 from app.api.routes import issues as issue_routes
 from app.core.config import settings
+from app.core.middleware import RateLimitMiddleware, RequestLoggingMiddleware
 from app.crud.admin import seed_admin
 from app.db.session import SessionLocal, get_session
 
@@ -38,6 +39,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(RequestLoggingMiddleware)
+app.add_middleware(RateLimitMiddleware)
 
 app.include_router(auth_routes.router)
 app.include_router(category_routes.router)

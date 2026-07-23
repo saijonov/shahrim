@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     admin_email: str = ""
     admin_password: str = ""
 
+    # Rate limiting (Phase 8) — disabled in the test suite.
+    rate_limit_enabled: bool = True
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
