@@ -13,7 +13,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 | 2 | Report flow (no AI) | ✅ |
 | 3 | AI pipeline (OpenAI GPT-4o vision) | ✅ |
 | 4 | My reports + statuses + notifications | ✅ |
-| 5 | Admin portal (map, filters, analytics, resolve) | ⬜ |
+| 5 | Admin portal (map, filters, analytics, resolve) | ✅ |
 | 6 | Rating | ⬜ |
 | 7 | Native app (Expo) | ⬜ |
 | 8 | Polish & hardening | ⬜ |
@@ -108,3 +108,21 @@ Real GPT-4o analysis activates automatically once `OPENAI_API_KEY` is set in `.e
 
 ### Note
 The live "get a Telegram message on status change" is exercised end-to-end in Phase 5, when an admin resolves an issue (that action calls `change_issue_status`).
+
+---
+
+## Phase 5 — Admin portal
+
+**Goal:** an operator logs in from the desktop, sees issues on a map + queue, filters, and resolves one with a result photo; the citizen is notified.
+
+### Log
+- **Backend (`app/api/routes/admin.py`, `app/crud/admin.py`):** email+password login (bcrypt) → JWT; `get_current_admin` RBAC. `GET /admin/issues` (filters: status/category/urgency/date range/district + paging, with reporter name/phone), `GET /admin/issues/map` (geo points), `GET /admin/issues/{id}` (detail + timeline + resolution + reporter), `POST /admin/issues/{id}/status`, `POST /admin/issues/{id}/resolve` (creates Resolution, sets resolved) — both notify the citizen via `change_issue_status`. `GET /admin/analytics` (counts by status/category, avg resolution hours, avg rating, 30-day trend). Admin account seeded on startup from `ADMIN_EMAIL`/`ADMIN_PASSWORD`.
+- **Admin web app (`apps/admin`, React+TS+Vite, port 5174):** login page + auth guard (401 → logout); dashboard with analytics cards + recharts trend/category charts; Leaflet/OSM map with urgency-colored pins + `leaflet.heat` heatmap (click pin → detail); filter bar; paginated issue table; issue detail drawer with status-change + upload-and-resolve actions. Uzbek throughout, Samarkand tokens, light+dark.
+
+### What was tested (all green)
+- Backend `pytest`: **44 passed** (adds: admin login ok/wrong-password; `/admin/me`; citizen → 403; auth required; issue list + filter + reporter; map; analytics shape; change-status; resolve → Resolution + resolved + timeline). Live admin login verified (seeded from `.env`). `ruff` + format clean.
+- Admin app: `tsc --noEmit` clean; `vitest` **7 passed** (login flow + 401; dashboard cards/table; detail status-change/reject-reason/upload-resolve). **Production build succeeds** (`vite build`). Full workspace typecheck (5 projects) green.
+
+### Notes
+- Admin dev server runs on **http://localhost:5174**; log in with the `ADMIN_EMAIL`/`ADMIN_PASSWORD` from `.env`.
+- The admin JS bundle is ~780 KB (Leaflet + Recharts) — code-splitting deferred to Phase 8 polish.

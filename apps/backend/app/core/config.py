@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_model: str = "gpt-4o"
 
+    # Admin portal (Phase 5) — an admin account is seeded on startup if both are set.
+    admin_email: str = ""
+    admin_password: str = ""
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
