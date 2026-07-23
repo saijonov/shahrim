@@ -2,7 +2,7 @@
 
 Tracking the phased build of Shahrim. Each phase ends with: tests written + passing, manual end-to-end check, this file updated, and a commit + push.
 
-Legend: ⬜ not started · 🟡 in progress · ✅ done
+Legend: ⬜ not started · 🟡 in progress · ✅ done · ✅ * code-complete + static checks green, on-device verification pending
 
 ## Phase status
 
@@ -15,7 +15,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 | 4 | My reports + statuses + notifications | ✅ |
 | 5 | Admin portal (map, filters, analytics, resolve) | ✅ |
 | 6 | Rating | ✅ |
-| 7 | Native app (Expo) | ⬜ |
+| 7 | Native app (Expo) | ✅ * |
 | 8 | Polish & hardening | ⬜ |
 
 ---
@@ -141,3 +141,17 @@ The live "get a Telegram message on status change" is exercised end-to-end in Ph
 ### What was tested (all green)
 - Backend `pytest`: **47 passed** (adds: rate resolved issue; reject before-resolved → 400, duplicate → 409, non-owner → 404, invalid stars → 422; rating in detail; avg_rating in analytics). `ruff` + format clean.
 - Mini App: `tsc --noEmit` clean; `vitest` **17 passed** (adds: star selector + submit calls rateIssue → thank-you; already-rated read-only; no section when not resolved). Workspace typecheck (5 projects) green.
+
+---
+
+## Phase 7 — Native app (Expo)
+
+**Goal:** the full citizen flow on a native iOS/Android app, reaching parity with the Mini App.
+
+### Log
+- **Backend native auth:** `LoginCode` table (migration 0002); the bot's `/start login_<nonce>` deep link binds the nonce to the user after phone-share; `POST /auth/native/exchange {nonce}` issues a JWT once bound (one-time), 404 while pending.
+- **Native app (`apps/mobile`, Expo SDK 51 + expo-router + TS):** Telegram deep-link onboarding (mint nonce → open bot → poll exchange → token in `expo-secure-store`), home, report flow (`expo-image-picker` → upload → AI analyze chips + category/urgency + `expo-location` + `react-native-maps` draggable pin with a coords-only fallback → submit), my reports, and detail with status timeline + result photo + the 1–5 star rating widget. Reuses `@shahrim/{i18n,ui-tokens,api-client}`; Uzbek-only UI; light/dark theme; pnpm-monorepo Metro config per Expo's guide. `react-native-maps` is isolated behind a lazy load + error boundary so a native-module problem degrades gracefully.
+
+### What was tested
+- **Static only (all green):** backend `pytest` **50 passed** (adds native exchange bound→token+one-time, unknown/pending→404); `ruff` clean. Mobile `tsc --noEmit` 0 errors + `jest-expo` **16 passed**. Full workspace typecheck (6 projects) green; Mini App 17 + admin 7 still pass.
+- **On-device verification pending (the ✅ * caveat):** no simulator/emulator exists in this environment, so the app was not run. The Telegram round-trip, camera upload, geolocation, and maps must be verified on a real phone via **Expo Go** — steps provided in chat. Runtime issues found there will be fixed in Phase 8.
