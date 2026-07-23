@@ -11,7 +11,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 | 0 | Foundation (repo, tooling, DB + migrations, health, assets, CI) | ✅ |
 | 1 | Telegram auth + user | ✅ |
 | 2 | Report flow (no AI) | ✅ |
-| 3 | AI pipeline (OpenAI GPT-4o vision) | ⬜ |
+| 3 | AI pipeline (OpenAI GPT-4o vision) | ✅ |
 | 4 | My reports + statuses + notifications | ⬜ |
 | 5 | Admin portal (map, filters, analytics, resolve) | ⬜ |
 | 6 | Rating | ⬜ |
@@ -73,3 +73,21 @@ Ready to run: start the Mini App dev server + a cloudflared tunnel, set `MINIAPP
 - Backend `pytest`: **20 passed** (adds: categories list = 9; upload→create issue with PostGIS geometry populated + status-history row; create requires auth; upload rejects non-image; bad category → 422). `ruff` + format clean.
 - Mini App: `tsc --noEmit` clean; `vitest` **5 passed** (auth shell 2 + report flow 3). Full workspace typecheck (4 projects) green.
 - Live: `/categories` served by the running backend; report flow HMR-loaded into the Mini App behind the existing cloudflared tunnel.
+
+---
+
+## Phase 3 — AI pipeline (OpenAI GPT-4o vision)
+
+**Goal:** photographing a real problem yields Uzbek suggestions + a sensible category + urgency; the AI-down path still lets the user submit.
+
+### Log
+- **Backend:** pluggable `AIProvider` interface (`app/services/ai/`). `OpenAIProvider` sends the photo to GPT-4o vision with a strict **Uzbek JSON-only** prompt → `{suggestions[1-2], category, urgency, is_valid_city_issue}`; guardrails: `parse_analysis` coerces out-of-range category→`other`/urgency→`medium`, retries once on bad JSON. `MockProvider` used when no key is set. `get_ai_provider()` picks based on `OPENAI_API_KEY`. New `POST /issues/analyze {photo_url}` reads the stored photo (`Storage.read`) and returns the analysis; on any AI failure it returns a safe default so **reporting is never blocked**.
+- **Mini App:** after upload, calls `analyzePhoto()`; shows an "analyzing" state, renders 1–2 Uzbek **suggestion chips** (tap fills the editable description), pre-selects the AI category, sends the AI `urgency` on submit, and if `is_valid_city_issue` is false shows the `retake_photo` prompt and requires a new photo. Fully graceful if AI returns nothing.
+- `@shahrim/api-client` gained `analyzePhoto()` + `AnalysisResult`.
+
+### What was tested (all green)
+- Backend `pytest`: **30 passed** (adds: `parse_analysis` valid/coercion/cap-2/invalid-JSON; MockProvider; factory picks mock-without-key / openai-with-key; `/issues/analyze` returns a valid result via mock; missing photo → 400; requires auth). `ruff` + format clean.
+- Mini App: `tsc --noEmit` clean; `vitest` **8 passed** (adds: analysis runs after upload + chip fills description; AI category+urgency reach `createIssue`; invalid photo → retake). Workspace typecheck green.
+
+### Note
+Real GPT-4o analysis activates automatically once `OPENAI_API_KEY` is set in `.env` (dev currently uses the mock provider, so no key is required to run/test).

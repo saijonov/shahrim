@@ -24,6 +24,10 @@ class Storage(ABC):
     async def save(self, file: UploadFile, subdir: str = "photos") -> str:
         """Persist an upload and return a URL path (served under /media)."""
 
+    @abstractmethod
+    async def read(self, url: str) -> bytes:
+        """Read back bytes for a URL previously returned by ``save``."""
+
 
 class LocalStorage(Storage):
     def __init__(self, base_dir: str) -> None:
@@ -45,6 +49,19 @@ class LocalStorage(Storage):
             fh.write(content)
 
         return f"/media/{subdir}/{name}"
+
+    async def read(self, url: str) -> bytes:
+        prefix = "/media/"
+        if not url or not url.startswith(prefix):
+            raise StorageError("invalid media url")
+        base = os.path.abspath(self.base_dir)
+        path = os.path.abspath(os.path.join(base, url[len(prefix) :]))
+        if os.path.commonpath([base, path]) != base:
+            raise StorageError("invalid path")
+        if not os.path.exists(path):
+            raise StorageError("file not found")
+        with open(path, "rb") as fh:
+            return fh.read()
 
 
 def get_storage() -> Storage:

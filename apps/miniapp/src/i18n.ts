@@ -25,6 +25,8 @@ const localMessages = {
   report_error: "Murojaatni yuborishda xatolik yuz berdi. Qayta urinib ko'ring.",
   sending: "Yuborilmoqda...",
   optional: "Ixtiyoriy",
+  // AI analysis (Phase 3) — heading above the suggested-description chips.
+  ai_suggestions: "Tavsiya etilgan tavsiflar",
 } as const;
 
 const translation = { ...messages, ...localMessages };

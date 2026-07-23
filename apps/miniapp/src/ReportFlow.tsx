@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { createClient, ApiError } from "@shahrim/api-client";
-import type { Category } from "@shahrim/api-client";
+import type { Category, Urgency } from "@shahrim/api-client";
 import tokens from "@shahrim/ui-tokens";
 import { compressImage } from "./lib/image";
 
@@ -70,10 +70,13 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
 
   // Description + category
   const [description, setDescription] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [urgency, setUrgency] = useState<Urgency | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryCode, setCategoryCode] = useState<string>(DEFAULT_CATEGORY);
 
@@ -132,22 +135,56 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
       event.target.value = "";
       if (!file) return;
 
+      // A fresh photo resets any prior analysis so stale chips/urgency/category
+      // never leak into a new report.
       setPhotoError(null);
       setPhotoUrl(null);
+      setSuggestions([]);
+      setUrgency(null);
+      setCategoryCode(DEFAULT_CATEGORY);
       setPreviewUrl((prev) => {
         if (prev) URL.revokeObjectURL(prev);
         return URL.createObjectURL(file);
       });
 
       setUploading(true);
+      let uploadedUrl: string | null = null;
       try {
         const compressed = await compressImage(file);
         const { photo_url } = await client.uploadPhoto(compressed);
+        uploadedUrl = photo_url;
         setPhotoUrl(photo_url);
       } catch {
         setPhotoError(t("report_error"));
       } finally {
         setUploading(false);
+      }
+
+      if (!uploadedUrl) return;
+
+      // AI analysis (PRD §8): suggestions + category + urgency + validity.
+      // Non-blocking — the backend never hard-errors this, but any failure here
+      // is treated as "no analysis" so the citizen can always type and submit.
+      setAnalyzing(true);
+      try {
+        const result = await client.analyzePhoto(uploadedUrl);
+        if (!result.is_valid_city_issue) {
+          // Not a city problem — require a retake (clear photoUrl so "Next" is
+          // blocked) and explain why, in Uzbek. Kept friendly, not punitive.
+          setPhotoUrl(null);
+          setPhotoError(t("retake_photo"));
+        } else {
+          setSuggestions(
+            Array.isArray(result.suggestions) ? result.suggestions.slice(0, 2) : [],
+          );
+          // Backend guarantees a valid code (defaults to "other").
+          if (result.category) setCategoryCode(result.category);
+          setUrgency(result.urgency ?? null);
+        }
+      } catch {
+        // AI unavailable — proceed with no suggestions; user types their own.
+      } finally {
+        setAnalyzing(false);
       }
     },
     [client, t],
@@ -214,7 +251,7 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
         photo_url: photoUrl,
         user_description: description.trim(),
         category_code: categoryCode,
-        urgency: null,
+        urgency: urgency ?? "medium",
         lat,
         lng,
         address_text: null,
@@ -227,7 +264,7 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
     } finally {
       setSubmitting(false);
     }
-  }, [client, photoUrl, description, categoryCode, lat, lng, t]);
+  }, [client, photoUrl, description, categoryCode, urgency, lat, lng, t]);
 
   const pad6 = tokens.space[6];
 
@@ -308,11 +345,11 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
             {previewUrl ? (
               <div className="sh-photo">
                 <img className="sh-photo__img" src={previewUrl} alt="" />
-                {uploading && (
+                {(uploading || analyzing) && (
                   <div className="sh-photo__overlay" role="status">
                     <span className="sh-spinner" aria-hidden="true" />
                     <span style={{ fontSize: tokens.fontSize.sm }}>
-                      {t("uploading")}
+                      {uploading ? t("uploading") : t("analyzing")}
                     </span>
                   </div>
                 )}
@@ -356,6 +393,32 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
             <h2 className="sh-step__title" style={{ fontSize: tokens.fontSize.lg }}>
               {t("describe_problem")}
             </h2>
+
+            {suggestions.length > 0 && (
+              <div className="sh-suggests" style={{ gap: tokens.space[2] }}>
+                <p className="sh-meta" style={{ fontSize: tokens.fontSize.sm }}>
+                  {t("ai_suggestions")}
+                </p>
+                <div className="sh-suggests__list" style={{ gap: tokens.space[2] }}>
+                  {suggestions.map((suggestion, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className={
+                        "sh-suggest" +
+                        (description === suggestion ? " is-selected" : "")
+                      }
+                      aria-pressed={description === suggestion}
+                      onClick={() => setDescription(suggestion)}
+                      style={{ fontSize: tokens.fontSize.base }}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <textarea
               className="sh-textarea"
               rows={5}

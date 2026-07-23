@@ -5,6 +5,10 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 
+class AnalyzeRequest(BaseModel):
+    photo_url: str
+
+
 class IssueCreate(BaseModel):
     photo_url: str | None = None
     user_description: str = ""

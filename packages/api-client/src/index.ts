@@ -80,6 +80,13 @@ export interface UploadResponse {
   photo_url: string;
 }
 
+export interface AnalysisResult {
+  suggestions: string[];
+  category: string;
+  urgency: Urgency;
+  is_valid_city_issue: boolean;
+}
+
 export interface IssueCreate {
   photo_url: string | null;
   user_description: string;
@@ -103,6 +110,8 @@ export interface ApiClient {
   uploadPhoto: (file: File) => Promise<UploadResponse>;
   /** Create an issue report. */
   createIssue: (payload: IssueCreate) => Promise<Issue>;
+  /** Run AI analysis on an uploaded photo (suggestions + category + urgency). */
+  analyzePhoto: (photoUrl: string) => Promise<AnalysisResult>;
 }
 
 export function createClient(options: ClientOptions): ApiClient {
@@ -148,5 +157,10 @@ export function createClient(options: ClientOptions): ApiClient {
     },
     createIssue: (payload: IssueCreate) =>
       request<Issue>("/issues", { method: "POST", body: JSON.stringify(payload) }),
+    analyzePhoto: (photoUrl: string) =>
+      request<AnalysisResult>("/issues/analyze", {
+        method: "POST",
+        body: JSON.stringify({ photo_url: photoUrl }),
+      }),
   };
 }
