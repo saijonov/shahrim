@@ -15,4 +15,5 @@ UZ: dict[str, str] = {
         "Rahmat! Raqamingiz qabul qilindi. Ilova havolasi tez orada tayyor bo'ladi."
     ),
     "open_app": "Shahrim'ni ochish",
+    "return_to_app": "Rahmat! Endi Shahrim ilovasiga qayting — tizimga kirdingiz.",
 }
