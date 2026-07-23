@@ -1,0 +1,210 @@
+/*
+ * Shahrim Mini App — base theme.
+ *
+ * Every palette value below mirrors @shahrim/ui-tokens (Samarkand majolica:
+ * cobalt + dome turquoise on warm paper). They are surfaced as CSS custom
+ * properties so light/dark can flip; components pull spacing, radius, type and
+ * font stacks straight from the tokens object. This is a deliberate civic
+ * identity — not a default AI aesthetic.
+ */
+:root {
+  color-scheme: light dark;
+
+  --sh-primary: #143c8c; /* color.primary  — Samarkand cobalt */
+  --sh-accent: #1ca5a0; /* color.accent   — dome turquoise */
+  --sh-bg: #f5f2ec; /* color.surface  — warm paper */
+  --sh-fg: #16202e; /* color.ink */
+  --sh-card: #ffffff; /* color.white */
+  --sh-border: #ded8cc; /* color.border */
+  --sh-muted: #6b7686; /* color.muted */
+  --sh-brand: var(--sh-primary);
+
+  --sh-font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sh-bg: #0e141c;
+    --sh-fg: #eceff4;
+    --sh-card: #17212e; /* near color.ink */
+    --sh-border: #2a3646;
+    --sh-muted: #98a4b6;
+    --sh-brand: #35c2bc; /* lightened turquoise for AA contrast on dark */
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--sh-bg);
+  color: var(--sh-fg);
+  font-family: var(--sh-font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.sh-app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--sh-bg);
+  color: var(--sh-fg);
+}
+
+/* Signature majolica bar — cobalt to turquoise. */
+.sh-topbar {
+  height: 6px;
+  flex: 0 0 auto;
+  background: linear-gradient(90deg, var(--sh-primary), var(--sh-accent));
+}
+
+.sh-main {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sh-brandrow {
+  display: flex;
+  align-items: center;
+}
+
+.sh-tile {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--sh-primary), var(--sh-accent));
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
+.sh-wordmark {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--sh-brand);
+}
+
+.sh-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--sh-card);
+  border: 1px solid var(--sh-border);
+}
+
+.sh-card--notice {
+  align-items: center;
+  text-align: center;
+}
+
+.sh-emoji {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.sh-notice-text {
+  margin: 0;
+  color: var(--sh-fg);
+}
+
+.sh-greeting {
+  margin: 0;
+  font-weight: 600;
+}
+
+.sh-meta {
+  margin: 0;
+  color: var(--sh-muted);
+}
+
+.sh-notice-inline {
+  text-align: center;
+}
+
+.sh-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.sh-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+}
+
+/* Large, one-handed tap targets. */
+.sh-btn {
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  min-height: 56px;
+  transition:
+    transform 0.12s ease,
+    filter 0.12s ease;
+}
+
+.sh-btn:focus-visible {
+  outline: 3px solid var(--sh-accent);
+  outline-offset: 2px;
+}
+
+.sh-btn:active {
+  transform: translateY(1px);
+}
+
+.sh-btn:hover {
+  filter: brightness(1.05);
+}
+
+.sh-btn--primary {
+  background: var(--sh-primary);
+  color: #ffffff;
+}
+
+.sh-btn--secondary {
+  background: transparent;
+  color: var(--sh-brand);
+  border: 2px solid var(--sh-border);
+}
+
+.sh-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--sh-border);
+  border-top-color: var(--sh-accent);
+  animation: sh-spin 0.8s linear infinite;
+}
+
+@keyframes sh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-btn {
+    transition: none;
+  }
+  .sh-btn:active {
+    transform: none;
+  }
+  .sh-spinner {
+    animation: none;
+  }
+}

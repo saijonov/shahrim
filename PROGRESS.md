@@ -9,7 +9,7 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 | Phase | Description | Status |
 |---|---|---|
 | 0 | Foundation (repo, tooling, DB + migrations, health, assets, CI) | ✅ |
-| 1 | Telegram auth + user | ⬜ |
+| 1 | Telegram auth + user | ✅ |
 | 2 | Report flow (no AI) | ⬜ |
 | 3 | AI pipeline (OpenAI GPT-4o vision) | ⬜ |
 | 4 | My reports + statuses + notifications | ⬜ |
@@ -36,3 +36,24 @@ Legend: ⬜ not started · 🟡 in progress · ✅ done
 - `ruff check .` → all checks passed; `ruff format --check .` → clean.
 - `pnpm install` + `pnpm -r run typecheck` → all 3 packages green.
 - Verified `.gitignore` excludes `CLAUDE.md`, `.env`, secrets, `.claude/`, plans, `__pycache__`, `uploads/`, `node_modules`; confirmed none appear in the commit set.
+
+---
+
+## Phase 1 — Telegram auth + user
+
+**Goal:** bot `/start` → Mini App; server-side `initData` validation (never trust the client); phone capture; user upsert; JWT session.
+
+### Log
+- **Backend:** `POST /auth/telegram` validates the raw `initData` HMAC with the bot token (`app/services/telegram_auth.py`), upserts the citizen, and returns a JWT + user. `GET /me` returns the current user (JWT bearer). JWT in `app/core/security.py`; user upsert in `app/crud/user.py`; auth dependency in `app/api/deps.py`.
+- **Bot (aiogram, own Docker service):** `/start` greets in Uzbek and shows a "share phone" contact button; on a valid own-contact it upserts the phone, then offers a WebApp button opening `MINIAPP_URL`. Uzbek copy centralised in `app/bot/messages.py`.
+- **Mini App (`apps/miniapp`, Vite + React + TS):** on load reads `window.Telegram.WebApp.initData`, calls `/auth/telegram` via the shared `@shahrim/api-client`, stores the token, shows an Uzbek home (greeting + phone + report/history buttons). Graceful states for non-Telegram browsers, loading, and auth errors. Styled from `@shahrim/ui-tokens` (Samarkand palette), i18n only.
+- Vite proxies `/api` → backend and allows `*.trycloudflare.com`, so one tunnel serves the whole Mini App.
+
+### What was tested (all green)
+- Backend `pytest`: **15 passed** — initData validation (valid / tampered / wrong-token / expired / missing-hash / missing-user / empty-token); auth API (`/auth/telegram` creates user → `/me` works, bad hash → 401, `/me` without/with garbage token → 401/403); bot logic (own-contact check, phone upsert create+update).
+- `ruff check` + `ruff format --check`: clean.
+- Bot container starts and polls successfully with the real token (token validated by Telegram).
+- Mini App: `tsc --noEmit` clean; `vitest` **2 passed** (renders without Telegram → shows Uzbek "open in Telegram" notice; wordmark present). Full workspace typecheck (4 projects) green.
+
+### Live in-Telegram check (manual — you run it via the cloudflared tunnel)
+Ready to run: start the Mini App dev server + a cloudflared tunnel, set `MINIAPP_URL`, then in Telegram open the bot → `/start` → share phone → open app → confirm the home screen shows your name + phone. Steps provided in chat.

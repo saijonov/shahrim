@@ -70,9 +70,19 @@ export class ApiError extends Error {
   }
 }
 
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
+
 export interface ApiClient {
   request: <T>(path: string, init?: RequestInit) => Promise<T>;
   health: () => Promise<{ status: string }>;
+  /** Validate Telegram Mini App initData server-side and get a session token. */
+  authTelegram: (initData: string) => Promise<AuthResponse>;
+  /** Current authenticated user (requires a token via getToken). */
+  me: () => Promise<User>;
 }
 
 export function createClient(options: ClientOptions): ApiClient {
@@ -104,5 +114,11 @@ export function createClient(options: ClientOptions): ApiClient {
   return {
     request,
     health: () => request<{ status: string }>("/health"),
+    authTelegram: (initData: string) =>
+      request<AuthResponse>("/auth/telegram", {
+        method: "POST",
+        body: JSON.stringify({ init_data: initData }),
+      }),
+    me: () => request<User>("/me"),
   };
 }

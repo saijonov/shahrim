@@ -44,6 +44,24 @@ services:
       - uploads:/app/uploads
     command: ["sh", "./entrypoint.sh", "--reload"]
 
+  bot:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-change-me}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://shahrim:shahrim@db:5432/shahrim}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      MINIAPP_URL: ${MINIAPP_URL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/backend:/app
+    command: ["python", "-m", "app.bot"]
+
   adminer:
     image: adminer:4
     restart: unless-stopped

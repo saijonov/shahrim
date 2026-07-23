@@ -17,6 +17,8 @@ dependencies = [
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
     "python-multipart>=0.0.12",
+    "pyjwt>=2.9",
+    "aiogram>=3.13",
 ]
 
 [project.optional-dependencies]
