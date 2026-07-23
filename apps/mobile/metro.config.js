@@ -30,4 +30,29 @@ config.resolver.nodeModulesPaths = [
 // Keep hierarchical lookup on so nested node_modules still resolve.
 config.resolver.disableHierarchicalLookup = false;
 
+// 3. Force a SINGLE copy of React from this app's node_modules. The monorepo also
+// contains React 18 (the web apps); without this, Metro can pull in a second React
+// and rendering fails with "multiple copies of the react package". We rewrite the
+// resolution origin for react/react-dom to the app's node_modules while still using
+// Metro's normal resolver (so subpaths like react/jsx-runtime keep working).
+const appNodeModules = path.resolve(projectRoot, "node_modules");
+const upstreamResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (
+    moduleName === "react" ||
+    moduleName.startsWith("react/") ||
+    moduleName === "react-dom" ||
+    moduleName.startsWith("react-dom/")
+  ) {
+    const pinnedContext = {
+      ...context,
+      originModulePath: path.join(appNodeModules, "index.js"),
+    };
+    return context.resolveRequest(pinnedContext, moduleName, platform);
+  }
+  return upstreamResolveRequest
+    ? upstreamResolveRequest(context, moduleName, platform)
+    : context.resolveRequest(context, moduleName, platform);
+};
+
 module.exports = config;
