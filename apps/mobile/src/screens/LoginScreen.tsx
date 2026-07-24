@@ -10,7 +10,7 @@ import { BOT_USERNAME } from "../config";
 import { buildTelegramLoginUrl } from "../auth-url";
 import { useAuth } from "../AuthContext";
 import { useTheme } from "../theme";
-import { Button, Card, Loading, Meta, Subtitle, Title } from "../components/ui";
+import { Button, Card, Loading, Meta, Subtitle } from "../components/ui";
 
 const POLL_INTERVAL_MS = 2000;
 // ~4 minutes of polling before giving up and offering a retry.
@@ -122,21 +122,12 @@ export function LoginScreen() {
     >
       <View style={{ gap: theme.space[4] }}>
         <Image
-          source={require("../assets/logo-mark.png")}
-          style={{ width: 76, height: 76 }}
+          source={require("../assets/logo-full.png")}
+          style={{ width: 220, height: 195 }}
           resizeMode="contain"
           accessibilityLabel={t("app_name")}
         />
         <View style={{ gap: theme.space[2] }}>
-          <Title
-            style={{
-              fontSize: theme.fontSize["3xl"],
-              fontFamily: theme.font.displayExtra,
-              color: theme.color.primary,
-            }}
-          >
-            {t("app_name")}
-          </Title>
           <Subtitle
             style={{
               fontSize: theme.fontSize.lg,

@@ -28,23 +28,13 @@ export function HomeScreen() {
         flexGrow: 1,
       }}
     >
-      {/* Brand header — same logo as the web app. */}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: theme.space[2] }}>
-        <Image
-          source={require("../assets/logo-mark.png")}
-          style={{ width: 30, height: 34 }}
-          resizeMode="contain"
-        />
-        <Text
-          style={{
-            fontFamily: theme.font.display,
-            fontSize: theme.fontSize.xl,
-            color: theme.color.primary,
-          }}
-        >
-          {t("app_name")}
-        </Text>
-      </View>
+      {/* Brand header — the Shahrim logo (same as the web app). */}
+      <Image
+        source={require("../assets/logo-full.png")}
+        style={{ width: 64, height: 56 }}
+        resizeMode="contain"
+        accessibilityLabel={t("app_name")}
+      />
 
       {/* Greeting — a plain, borderless block (mirrors the Mini App home). */}
       <View style={{ gap: theme.space[2] }}>

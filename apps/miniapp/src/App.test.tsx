@@ -24,8 +24,8 @@ describe("App (Mini App auth shell)", () => {
     expect(notice).toBeInTheDocument();
   });
 
-  it("does not crash and shows the app name", async () => {
+  it("does not crash and shows the app logo", async () => {
     render(<App />);
-    expect(await screen.findByText("Shahrim")).toBeInTheDocument();
+    expect(await screen.findByAltText("Shahrim")).toBeInTheDocument();
   });
 });

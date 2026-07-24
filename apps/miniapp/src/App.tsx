@@ -7,7 +7,7 @@ import { ReportFlow } from "./ReportFlow";
 import { MyReports } from "./MyReports";
 import { IssueDetail } from "./IssueDetail";
 import { Icon } from "./components/Icon";
-import spriteMarkup from "./assets/sprite.svg?raw";
+import logoUrl from "./assets/logo-full.png";
 import "./i18n";
 
 type Phase = "init" | "no_telegram" | "loading" | "error" | "ready";
@@ -64,24 +64,13 @@ export function App() {
 
   return (
     <div className="sh-app">
-      <div
-        className="sh-sprite"
-        aria-hidden="true"
-        dangerouslySetInnerHTML={{ __html: spriteMarkup }}
-      />
       <main
         className="sh-main"
         style={{ padding: tokens.space[6], gap: tokens.space[6] }}
       >
         {showBrand ? (
-          <header className="sh-brandrow" style={{ gap: tokens.space[3] }}>
-            <Icon id="logo-mark" size={32} className="sh-logo" />
-            <h1
-              className="sh-wordmark"
-              style={{ fontSize: tokens.fontSize["2xl"] }}
-            >
-              {t("app_name")}
-            </h1>
+          <header className="sh-brandrow">
+            <img src={logoUrl} alt={t("app_name")} className="sh-logo-full" />
           </header>
         ) : null}
 

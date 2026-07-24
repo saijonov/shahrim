@@ -97,6 +97,12 @@ body {
   align-items: center;
 }
 
+.sh-logo-full {
+  display: block;
+  height: 60px;
+  width: auto;
+}
+
 .sh-logo {
   display: block;
   width: 32px;
