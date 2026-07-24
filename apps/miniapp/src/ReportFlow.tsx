@@ -370,7 +370,16 @@ export function ReportFlow({ onExit }: ReportFlowProps) {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <span className="sh-dropzone__icon" aria-hidden="true">
-                  <Icon id="ic-camera" size={42} />
+                  {/* Inline (not sprite <use>) so it always renders in the
+                      Telegram iOS webview, with an explicit cobalt fill. */}
+                  <svg width={42} height={42} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path
+                      d="M9.2 3.5c-.5 0-1 .3-1.2.8L7.2 6H4.5A2.5 2.5 0 0 0 2 8.5v9A2.5 2.5 0 0 0 4.5 20h15a2.5 2.5 0 0 0 2.5-2.5v-9A2.5 2.5 0 0 0 19.5 6h-2.7l-.8-1.7c-.2-.5-.7-.8-1.2-.8H9.2Z"
+                      fill="var(--co-primary, #143C8C)"
+                    />
+                    <circle cx="12" cy="13" r="4" fill="#ffffff" />
+                    <circle cx="12" cy="13" r="2" fill="var(--co-primary, #143C8C)" />
+                  </svg>
                 </span>
                 <span style={{ fontSize: tokens.fontSize.lg }}>
                   {t("add_photo")}
